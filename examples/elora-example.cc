@@ -46,9 +46,7 @@ main(int argc, char* argv[])
     std::string apiAddr = "127.0.0.1";
     uint16_t apiPort = 8090;
     std::string token =
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."
-        "eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjZlMjQ4NjljLWQxMjItNDZkOS04Nz"
-        "E0LTM5Yzc4Nzg4OTRhZCIsInR5cCI6ImtleSJ9.IB20o6Jrcwj5qZ9mPEuthzzqMyc3YNSl8by_ZXrjqhw";
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjVkZTUyZDAwLTExMWMtNDQyMS1iMDA4LWFkNGRjMzViYzY4MCIsInR5cCI6ImtleSJ9.5ynMqBWS743vu_8vRnu-nxRpozqnpf8Oo1sBrkSe8OU";
     uint16_t destPort = 1700;
 
     double periods = 24; // H * D
