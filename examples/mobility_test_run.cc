@@ -1,43 +1,140 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/mobility-module.h"
-#include "ns3/internet-module.h"
-
-NS_LOG_COMPONENT_DEFINE("MobilityTestRun");
 
 using namespace ns3;
 
-void PrintPosition(Ptr<Node> node) {
-  Ptr<ConstantVelocityMobilityModel> cvmm = node->GetObject<ConstantVelocityMobilityModel>();
-  NS_LOG_INFO("Node position: " << cvmm->GetPosition());
-  Simulator::Schedule(Seconds(1.0), &PrintPosition, node); // Print position every 1 second
+struct BikeData {
+    int bikeId;
+    int duration;
+    double startX;
+    double startY;
+    double endX;
+    double endY;
+};
+
+std::vector<BikeData> readDataset(const std::string& filename) {
+    std::vector<BikeData> dataset;
+    std::ifstream file(filename);
+
+    if (file) {
+        std::string line;
+        std::getline(file, line); // Skip header line
+
+        while (std::getline(file, line)) {
+            std::stringstream ss(line);
+            std::string value;
+            BikeData bikeData;
+
+            std::getline(ss, value, ',');
+            bikeData.bikeId = std::stoi(value);
+
+            std::getline(ss, value, ',');
+            bikeData.duration = std::stoi(value);
+
+            std::getline(ss, value, ',');
+            bikeData.startX = std::stod(value);
+
+            std::getline(ss, value, ',');
+            bikeData.startY = std::stod(value);
+
+            std::getline(ss, value, ',');
+            bikeData.endX = std::stod(value);
+
+            std::getline(ss, value);
+            bikeData.endY = std::stod(value);
+
+            dataset.push_back(bikeData);
+        }
+
+        file.close();
+    }
+    else {
+        std::cerr << "Failed to open the file: " << filename << std::endl;
+    }
+
+    return dataset;
+}
+// MobilityApplication function
+void MobilityApplication(const std::vector<BikeData>& dataset) {
+    std::cout << "At Time = " << Simulator::Now().GetSeconds() << "s" << std::endl;
+    int prev = 0;
+    for (const auto& bike : dataset) {
+        if (Simulator::Now().GetSeconds() <= bike.duration && bike.bikeId != prev) {
+            if (bike.startX == bike.endX && bike.startY == bike.endY) {
+                std::cout << "Bike : " << bike.bikeId << " is Parked" << std::endl;
+                prev = bike.bikeId;
+            } 
+            else {
+                std::cout << "Bike : " << bike.bikeId << " is Transmitting Signals" << std::endl;
+                prev = bike.bikeId;
+            }
+        }
+    }
+    Simulator::Schedule(Seconds(1), &MobilityApplication, dataset);
 }
 
-int main(int argc, char *argv[]) {
-  LogComponentEnable("MobilityTestRun", LOG_LEVEL_INFO);
+// Define a helper function to invoke MobilityApplication with the dataset
+void InvokeMobilityApplication(const std::vector<BikeData>& dataset) {
+    MobilityApplication(dataset);
+}
 
-  // Create a Node container
-  NodeContainer nodes;
-  nodes.Create(1);
+int main() {
+    
+    // Start the simulation
+    Simulator::Run();
 
-  // Create a Mobility model and install it on the node
-  MobilityHelper mobility;
-  mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel");
-  mobility.Install(nodes);
+    std::string filename = "scratch/data_set_test.csv";
+    std::vector<BikeData> dataset = readDataset(filename);
 
-  // Set constant velocity for the node
-  Ptr<ConstantVelocityMobilityModel> cvmm = nodes.Get(0)->GetObject<ConstantVelocityMobilityModel>();
-  cvmm->SetVelocity(Vector(10.0, 0.0, 0.0)); // Set velocity along x-axis to 10 m/s
+    // Create a Node container
+    NodeContainer nodes;
+    nodes.Create(5); // Create two nodes
 
-  // Print node position periodically
-  Simulator::Schedule(Seconds(1.0), &PrintPosition, nodes.Get(0));
+    // Create a Mobility model and install it on the nodes
+    MobilityHelper mobility;
+    mobility.SetMobilityModel("ns3::WaypointMobilityModel");
+    mobility.Install(nodes);
 
-// Stop the simulation after 10 seconds
-  Simulator::Stop(Seconds(10.0));
+    
 
-  // Run the simulation
-  Simulator::Run();
-  Simulator::Destroy();
+    auto prev = 0;
+    bool flag = true;
+    int count = 0;
 
-  return 0;
+    for (const auto&  bike : dataset) {
+        if(bike.bikeId != prev){
+            Ptr<WaypointMobilityModel> waypointMobility = nodes.Get(count)->GetObject<WaypointMobilityModel>();
+
+            //std::cout << "Bike ID = " << bike.bikeId << std::endl;
+            for (const auto& nestedBike : dataset) {
+                if (nestedBike.bikeId == bike.bikeId) {
+                    if (flag){
+                        
+                        waypointMobility->AddWaypoint(Waypoint(Seconds(0.0), Vector(nestedBike.startX, nestedBike.startY, 0.0)));
+                     //   std::cout << "Duration (flag) = " << nestedBike.duration << std::endl; 
+                        flag = false;    
+                    }
+                    waypointMobility->AddWaypoint(Waypoint(Seconds(nestedBike.duration), Vector(nestedBike.endX, nestedBike.endY, 0.0)));
+                   // std::cout << "Duration  = " << nestedBike.duration << std::endl; 
+                }
+            }
+            flag = true;
+            prev = bike.bikeId;
+            count++;
+        }
+    }
+
+    // Schedule the initial display event
+    Simulator::Schedule(Seconds(0), &InvokeMobilityApplication, dataset);
+
+
+    // Stop the simulation after 41 seconds
+    Simulator::Stop(Seconds(41));
+
+    // Run the simulation
+    Simulator::Run();
+    Simulator::Destroy();
+
+    return 0;
 }
