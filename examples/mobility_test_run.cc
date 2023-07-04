@@ -111,7 +111,7 @@ TypeId MyApplication::GetTypeId() {
     return tid;
 }
 
-MyApplication::MyApplication() : m_node(0), m_printEvent() {}
+MyApplication::MyApplication() : m_node(nullptr), m_printEvent() {}
 
 MyApplication::~MyApplication() {}
 
@@ -121,9 +121,11 @@ void MyApplication::SetNode(Ptr<Node> node) {
 
 void MyApplication::PrintNodePosition() {
     if (m_node) {
-        Vector position = m_node->GetObject<MobilityModel>()->GetPosition();
-        NS_LOG_INFO("Node position: " << position.x << ", " << position.y << ", " << position.z);
-
+        //Vector position = m_node->GetObject<MobilityModel>()->GetPosition();
+        //NS_LOG_INFO("Node ID: " << m_node->GetId() << ", Position: " << position.x << ", " << position.y << ", " << position.z);
+        Ptr<ConstantVelocityMobilityModel> cvmm = m_node->GetObject<ConstantVelocityMobilityModel>();
+        NS_LOG_INFO("W00581:  " << m_node->GetId() << " | Node position: " << cvmm->GetPosition());
+        
         ScheduleNextPositionPrint();
     }
 }
@@ -186,34 +188,19 @@ int main (int argc, char *argv[]) {
                 cvmm->SetVelocity(velocity);
 
                 
-                // if(pair.first == "W20174"){
-                //     std :: cout << "Node : " << pair.first << " ,Node position: (" << (bike.end_lng - bike.start_lng) / bike.duration << ", " << (bike.end_lat - bike.start_lat) / bike.duration << ", " << "0.0" << ")" << std :: endl;
-                // }
+                if(pair.first == "W00581"){
+                    std :: cout << "\nNode : " << pair.second << " ,Node Velocity: (" << (bike.end_lng - bike.start_lng) / bike.duration << ", " << (bike.end_lat - bike.start_lat) / bike.duration << ", " << "0.0" << ")" << std :: endl;
+                    node->AddApplication(app);
+                    app->SetNode(node);
+                    // Configure and schedule events for your application
+                    app->SetStartTime(Seconds(1.0)); //startTime
+                    app->SetStopTime(Seconds(10.0)); //endTime
+                }
             }
         }
     }
 
-
-
-    // Create mobility model and set waypoints
-
-    // // Create a Mobility model and install it on the nodes
-    // MobilityHelper mobility;
-    // mobility.SetMobilityModel("ns3::WaypointMobilityModel");
-    // mobility.Install(nodes);
-
-    
-
-    // Ptr<Node> node = nodes.Get(0);
-
-    // // Create an instance of your application
-    // Ptr<MyApplication> app = CreateObject<MyApplication>();
-
-    // // Attach the application to the node
-    // node->AddApplication(app);
-    // app->SetNode(node);  // Set the node for the application
-    
-    
+  
     uint32_t startTimeUnix = 1577836859;  // GMT: Wednesday, January 1, 2020 12:00:59 AM
     uint32_t stopTimeUnix = 1580515175;   // GMT: Friday, January 31, 2020 11:59:35 PM
 
@@ -221,14 +208,11 @@ int main (int argc, char *argv[]) {
     Time startTime = Seconds(startTimeUnix);
     Time endTime = Seconds(stopTimeUnix);
 
-    std::cout << "Start Time : " << startTime << std::endl;
+    std::cout << "\nStart Time : " << startTime << std::endl;
     std::cout << "End Time : " << endTime << std::endl;
     std::cout << "Difference : " <<  endTime - startTime << " | approx. 30 days" << std::endl;
 
-    // // Configure and schedule events for your application
-    // app->SetStartTime(Seconds(0.0)); //startTime
-    // app->SetStopTime(Seconds(41.0)); //endTime
-    Simulator::Stop(endTime); // Set the overall simulation end time
+    Simulator::Stop(Seconds(50.0)); // Set the overall simulation end time
     // Run the simulation
     Simulator::Run();
     Simulator::Destroy();
