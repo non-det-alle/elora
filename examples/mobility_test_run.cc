@@ -9,10 +9,9 @@ NS_LOG_COMPONENT_DEFINE("MobilityTestRun");
 using namespace ns3;
 
 
-/*
-                    Structure for Bike Data
-
-*/
+    /***************************
+     *      Bike Struture      *
+     ***************************/
 struct BikeData {
     std::string bikeNumber;
     int duration;
@@ -81,10 +80,9 @@ std::vector<BikeData> readDataset(const std::string& filename) {
     return dataset;
 }
 
-/*
-                    Application Class
-
-*/
+    /***************************
+     *      MY Application     *
+     ***************************/
 class MyApplication : public Application {
 public:
     static TypeId GetTypeId();
@@ -124,7 +122,7 @@ void MyApplication::PrintNodePosition() {
         //Vector position = m_node->GetObject<MobilityModel>()->GetPosition();
         //NS_LOG_INFO("Node ID: " << m_node->GetId() << ", Position: " << position.x << ", " << position.y << ", " << position.z);
         Ptr<ConstantVelocityMobilityModel> cvmm = m_node->GetObject<ConstantVelocityMobilityModel>();
-        NS_LOG_INFO("W00581:  " << m_node->GetId() << " | Node position: " << cvmm->GetPosition());
+        NS_LOG_INFO("NODE ID:  " << m_node->GetId() << " | Node position: " << cvmm->GetPosition());
         
         ScheduleNextPositionPrint();
     }
@@ -144,10 +142,9 @@ void MyApplication::StopApplication() {
     Simulator::Cancel(m_printEvent);  // Cancel the position print event
 }
 
-/*
-                    Main
-
-*/
+    /***************************
+     *         MAIN            *
+     ***************************/
 
 int main (int argc, char *argv[]) {
     LogComponentEnable("MobilityTestRun", LOG_LEVEL_INFO);
