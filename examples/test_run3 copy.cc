@@ -150,7 +150,7 @@ void PrintNodePosition(Ptr<Node> node)
     Ptr<WaypointMobilityModel> waypointMobility = node->GetObject<WaypointMobilityModel>();
     Vector3D position = waypointMobility->GetPosition();
     double time = Simulator::Now().GetSeconds();
-    std::cout << "Node position at time " << time << ": (" << position.x << ", " << position.y << ", " << position.z << ")" << std::endl;
+    std::cout << "Node ID : " << node->GetId() << ", Node position at time " << time << ": (" << position.x << ", " << position.y << ", " << position.z << ")" << std::endl;
     std::cout << "Waypoint Left = " << waypointMobility->WaypointsLeft() << std :: endl;
     std::cout << "Velocity = " << waypointMobility->GetVelocity() << std :: endl;
     if(waypointMobility->WaypointsLeft() == 0 && waypointMobility->GetVelocity() == Vector3D(0, 0, 0)){
@@ -203,6 +203,13 @@ int main (int argc, char *argv[]) {
     waypointMobility->AddWaypoint(Waypoint(Seconds(20), Vector(100.0, 0.0, 0.0)));
     waypointMobility->AddWaypoint(Waypoint(Seconds(30), Vector(100.0, 100.0, 0.0)));
     Ptr<Node> node = nodes.Get(0);
+    Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
+
+    waypointMobility = nodes.Get(1)->GetObject<WaypointMobilityModel>();
+    waypointMobility->AddWaypoint(Waypoint(Seconds(5), Vector(10.0, 0.0, 0.0)));
+    waypointMobility->AddWaypoint(Waypoint(Seconds(10), Vector(0.0, 10.0, 0.0)));
+    waypointMobility->AddWaypoint(Waypoint(Seconds(15), Vector(10.0, 10.0, 0.0)));
+    node = nodes.Get(1);
 
     Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
 
