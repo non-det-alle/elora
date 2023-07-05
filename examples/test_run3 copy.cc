@@ -123,7 +123,7 @@ void MyApplication::SetNode(Ptr<Node> node) {
 void MyApplication::PrintNodePosition() {
     if (m_node) {
         Ptr<WaypointMobilityModel> waypointMobility = m_node->GetObject<WaypointMobilityModel>();
-        NS_LOG_INFO("NODE ID:  " << m_node->GetId() << " | Node position: " << waypointMobility->GetPosition());
+        NS_LOG_INFO("NODE ID:  " << m_node->GetId() << " | Node position: " << waypointMobility->GetPosition() << " , Time is : " << Simulator::Now().GetSeconds());
         
         ScheduleNextPositionPrint();
     }
@@ -135,7 +135,7 @@ void MyApplication::ScheduleNextPositionPrint() {
         Simulator::Stop();
     }
     else {
-        m_printEvent = Simulator::Schedule(Seconds(13.8), &MyApplication::PrintNodePosition, this);
+        m_printEvent = Simulator::Schedule(Seconds(1.0), &MyApplication::PrintNodePosition, this);
 
     }
 }
@@ -235,6 +235,20 @@ int main (int argc, char *argv[]) {
      *     Adding waypoints to nodes section        *
      ************************************************/
     
+    // Loop through the nodes
+    // for (uint32_t i = 0; i < nodes.GetN(); i++){
+    //     std::cout<<"Number = " << i << std :: endl;
+    // }
+
+    // // Create an instance of your application
+    // node = nodes.Get(365);
+    // Ptr<MyApplication> app = CreateObject<MyApplication>();
+    // node->AddApplication(app);
+    // app->SetNode(node);
+
+    // // Configure and schedule events for your application
+    // app->SetStartTime(Seconds(16339)); //startTime
+    // app->SetStopTime(Seconds(16553)); //endTime
 
 
 
@@ -252,13 +266,26 @@ int main (int argc, char *argv[]) {
     // Ptr<Node> node = nodes.Get(0);
     // Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
 
+    /************************************************
+     *  Example of 1 node with application class    *
+     ************************************************/
     // waypointMobility = nodes.Get(1)->GetObject<WaypointMobilityModel>();
     // waypointMobility->AddWaypoint(Waypoint(Seconds(5), Vector(10.0, 0.0, 0.0)));
     // waypointMobility->AddWaypoint(Waypoint(Seconds(10), Vector(0.0, 10.0, 0.0)));
     // waypointMobility->AddWaypoint(Waypoint(Seconds(15), Vector(10.0, 10.0, 0.0)));
     // node = nodes.Get(1);
 
-    // Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
+    // //Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
+
+    // //Create an instance of your application
+    // node = nodes.Get(1);
+    // Ptr<MyApplication> app = CreateObject<MyApplication>();
+    // node->AddApplication(app);
+    // app->SetNode(node);
+
+    // // Configure and schedule events for your application
+    // app->SetStartTime(Seconds(5)); //startTime
+    // app->SetStopTime(Seconds(33)); //endTime
  
 
     
@@ -266,9 +293,9 @@ int main (int argc, char *argv[]) {
     Time startTime = Seconds(0);
     Time endTime = Seconds(2713539);
 
-    std::cout << "\nStart Time : " << startTime << std::endl;
-    std::cout << "End Time : " << endTime << std::endl;
-    std::cout << "Difference : " <<  endTime - startTime << " | approx. 31.42 days" << std::endl;
+    // std::cout << "\nStart Time : " << startTime << std::endl;
+    // std::cout << "End Time : " << endTime << std::endl;
+    // std::cout << "Difference : " <<  endTime - startTime << " | approx. 31.42 days" << std::endl;
 
     Simulator::Stop(endTime); // Set the overall simulation end time 31.42 days
     // Run the simulation
