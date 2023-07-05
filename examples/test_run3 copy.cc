@@ -122,17 +122,22 @@ void MyApplication::SetNode(Ptr<Node> node) {
 
 void MyApplication::PrintNodePosition() {
     if (m_node) {
-        //Vector position = m_node->GetObject<MobilityModel>()->GetPosition();
-        //NS_LOG_INFO("Node ID: " << m_node->GetId() << ", Position: " << position.x << ", " << position.y << ", " << position.z);
-        Ptr<ConstantVelocityMobilityModel> cvmm = m_node->GetObject<ConstantVelocityMobilityModel>();
-        NS_LOG_INFO("NODE ID:  " << m_node->GetId() << " | Node position: " << cvmm->GetPosition());
+        Ptr<WaypointMobilityModel> waypointMobility = m_node->GetObject<WaypointMobilityModel>();
+        NS_LOG_INFO("NODE ID:  " << m_node->GetId() << " | Node position: " << waypointMobility->GetPosition());
         
         ScheduleNextPositionPrint();
     }
 }
 
 void MyApplication::ScheduleNextPositionPrint() {
-    m_printEvent = Simulator::Schedule(Seconds(1.0), &MyApplication::PrintNodePosition, this);
+    Ptr<WaypointMobilityModel> waypointMobility = m_node->GetObject<WaypointMobilityModel>();
+    if(waypointMobility->WaypointsLeft() == 0 && waypointMobility->GetVelocity() == Vector3D(0, 0, 0)){
+        Simulator::Stop();
+    }
+    else {
+        m_printEvent = Simulator::Schedule(Seconds(13.8), &MyApplication::PrintNodePosition, this);
+
+    }
 }
 
 void MyApplication::StartApplication() {
@@ -144,6 +149,7 @@ void MyApplication::StopApplication() {
     NS_LOG_INFO("MyApplication::StopApplication called");
     Simulator::Cancel(m_printEvent);  // Cancel the position print event
 }
+
 
 void PrintNodePosition(Ptr<Node> node)
 {
@@ -161,11 +167,6 @@ void PrintNodePosition(Ptr<Node> node)
 
     }
 }
-
-
-
-
-
 
     /***************************
      *         MAIN            *
@@ -207,30 +208,35 @@ int main (int argc, char *argv[]) {
      ************************************************/
     Ptr<WaypointMobilityModel> waypointMobility;
     Ptr<Node> node;
-    int row = 0; 
-    for (const BikeData& bike : dataset) {
-        for (const auto& pair : myMap) {
-            if (pair.first == bike.bikeNumber) {
-                // std :: cout << "row = " << row++ << std :: endl;
-                if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
-                    std :: cout << "row = " << row++ << " is Skipped" << std :: endl;
-                }
-                else{
-                    node = nodes.Get(pair.second);
-                    waypointMobility = nodes.Get(pair.second)->GetObject<WaypointMobilityModel>();
-                    // Waypoint 1 - Start Position
-                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.started_at_unix), Vector(bike.start_lng, bike.start_lat, 0.0)));
-                    std :: cout << "Start WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl; 
-                    // Waypoint 2 - End Position                
-                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.ended_at_unix), Vector(bike.end_lng, bike.end_lat, 0.0)));
-                    std :: cout << "End WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row++ << std :: endl;
-                }
+    // int row = 0; 
+    // for (const BikeData& bike : dataset) {
+    //     for (const auto& pair : myMap) {
+    //         if (pair.first == bike.bikeNumber) {
+    //             // std :: cout << "row = " << row++ << std :: endl;
+    //             if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
+    //                 std :: cout << "row = " << row++ << " is Skipped" << std :: endl;
+    //             }
+    //             else{
+    //                 node = nodes.Get(pair.second);
+    //                 waypointMobility = nodes.Get(pair.second)->GetObject<WaypointMobilityModel>();
+    //                 // Waypoint 1 - Start Position
+    //                 waypointMobility->AddWaypoint(Waypoint(Seconds(bike.started_at_unix), Vector(bike.start_lng, bike.start_lat, 0.0)));
+    //                 std :: cout << "Start WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl; 
+    //                 // Waypoint 2 - End Position                
+    //                 waypointMobility->AddWaypoint(Waypoint(Seconds(bike.ended_at_unix), Vector(bike.end_lng, bike.end_lat, 0.0)));
+    //                 std :: cout << "End WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row++ << std :: endl;
+    //             }
                
-            }
-        }
-    }  
+    //         }
+    //     }
+    // }  
+
+    /************************************************
+     *     Adding waypoints to nodes section        *
+     ************************************************/
     
-          
+
+
 
 
 
