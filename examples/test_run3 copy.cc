@@ -185,9 +185,7 @@ int main (int argc, char *argv[]) {
 
     // Map
     std::map<std::string, int> myMap;
-
     std::map<long, int> node_Map_StartTime;
-
     std::map<long, int> node_Map_EndTime;
 
     // Set
@@ -247,7 +245,7 @@ int main (int argc, char *argv[]) {
                     ************************************************/
                     if(!node_Map_StartTime.empty()){
                         // Checking if the key exists using the find() function
-                        auto it = node_Map_StartTime.find(key);
+                        auto it = node_Map_StartTime.find(pair.second);
                         if (it != node_Map_StartTime.end()) {
                             std::cout << "Key " << pair.second << " exists in the mapmap[node_Map_StartTime]" << std::endl;
                         } 
@@ -258,7 +256,7 @@ int main (int argc, char *argv[]) {
                     }
                     else{
                         node_Map_StartTime.insert(std::make_pair(pair.second, bike.started_at_unix));
-                        std::cout << "Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
+                        std::cout << "First Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
                     }
 
                     /***********************************************
@@ -266,9 +264,10 @@ int main (int argc, char *argv[]) {
                     ************************************************/
                     if(!node_Map_EndTime.empty()){
                         // Checking if the key exists using the find() function
-                        auto it = node_Map_EndTime.find(key);
+                        auto it = node_Map_EndTime.find(pair.second);
                         if (it != node_Map_EndTime.end()) {
                             if (node_Map_EndTime[pair.second] <= bike.ended_at_unix){
+                                std::cout << "Key " << pair.second << " is updated in the mapmap[node_Map_EndTime], From = " << node_Map_EndTime[pair.second] << " to " << bike.ended_at_unix << std::endl;
                                 node_Map_EndTime[pair.second] = bike.ended_at_unix; 
                             }
                             std::cout << "Key " << pair.second << " exists in the mapmap[node_Map_EndTime]" << std::endl;
@@ -280,7 +279,7 @@ int main (int argc, char *argv[]) {
                     }
                     else{
                         node_Map_EndTime.insert(std::make_pair(pair.second, bike.ended_at_unix));
-                        std::cout << "Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
+                        std::cout << "First Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
                     }
                     std :: cout << "*****************************************************************" << std :: endl;
                 }
@@ -291,14 +290,15 @@ int main (int argc, char *argv[]) {
     /************************************************
      *     Section Just to verify Values            *
      ************************************************/ 
-    // std :: cout << "*****************************************************************" << std :: endl;
-    // std :: cout << "Size of node_Map_StartTime Map is = " << node_Map_StartTime.size() << std :: endl;
-    // std :: cout << "Value Stored in Start Time of Node 421 is = " << node_Map_StartTime[421] << std :: endl;
-    // std :: cout << "Size of node_Map_EndTime Map is = " << node_Map_EndTime.size() << std :: endl;
-    // std :: cout << "Value Stored in Start Time of Node 421 is = " << node_Map_EndTime[421] << std :: endl;
-    // std :: cout << "Size of myMap is = " << myMap.size() << std :: endl; 
-    // std :: cout << "Value Stored in myMap of Node 421 is = " << myMap["W00581"] << std :: endl; 
-    // std :: cout << "*****************************************************************" << std :: endl;
+    std :: cout << "*****************************************************************" << std :: endl;
+    std :: cout << "Size of node_Map_StartTime Map is = " << node_Map_StartTime.size() << std :: endl;
+    std :: cout << "Value Stored in Start Time of Node 687 is = " << node_Map_StartTime[687] << std :: endl;
+    std :: cout << "Size of node_Map_EndTime Map is = " << node_Map_EndTime.size() << std :: endl;
+    std :: cout << "Value Stored in Start Time of Node 687 is = " << node_Map_EndTime[687] << std :: endl;
+    std :: cout << "Size of myMap is = " << myMap.size() << std :: endl; 
+    //auto it = node_Map_EndTime.find(687);
+    //std :: cout << "Value Stored in myMap of Node 687 is = " << it/*myMap["W01124"]*/ << std :: endl;  // W00581
+    std :: cout << "*****************************************************************" << std :: endl;
 
     /************************************************
      *     Adding waypoints to nodes section        *
@@ -357,7 +357,7 @@ int main (int argc, char *argv[]) {
     
     
     Time startTime = Seconds(0);
-    Time endTime = Seconds(2713539);
+    Time endTime = Seconds(1000); //2713539
     std :: cout << "*****************************************************************" << std :: endl;
     std::cout << "\nStart Time : " << startTime << std::endl;
     std::cout << "End Time : " << endTime << std::endl;
