@@ -124,7 +124,7 @@ void MyApplication::PrintNodePosition() {
     if (m_node) {
         Ptr<WaypointMobilityModel> waypointMobility = m_node->GetObject<WaypointMobilityModel>();
         NS_LOG_INFO("NODE ID:  " << m_node->GetId() << " | Node position: " << waypointMobility->GetPosition() << " , Time is : " << Simulator::Now().GetSeconds());
-        
+        std :: cout << "NODE ID:  " << m_node->GetId() << " | Node position: " << waypointMobility->GetPosition() << " , Time is : " << Simulator::Now().GetSeconds() << std :: endl;
         ScheduleNextPositionPrint();
     }
 }
@@ -141,12 +141,14 @@ void MyApplication::ScheduleNextPositionPrint() {
 }
 
 void MyApplication::StartApplication() {
-    NS_LOG_INFO("MyApplication::StartApplication called");
+    NS_LOG_INFO("MyApplication::StartApplication called for node = "  << m_node->GetId());
+    std :: cout << "MyApplication::StartApplication called for node = "  << m_node->GetId() << std :: endl;
     ScheduleNextPositionPrint();  // Schedule the first position print
 }
 
 void MyApplication::StopApplication() {
-    NS_LOG_INFO("MyApplication::StopApplication called");
+    NS_LOG_INFO("MyApplication::StopApplication called for node = " << m_node->GetId());
+    std :: cout << "MyApplication::StopApplication called for node = " << m_node->GetId() << std :: endl; 
     Simulator::Cancel(m_printEvent);  // Cancel the position print event
 }
 
@@ -221,70 +223,70 @@ int main (int argc, char *argv[]) {
     /************************************************
      *     Adding waypoints to nodes section        *
      ************************************************/
-    // int row = 0; 
-    // for (const BikeData& bike : dataset) {
-    //     for (const auto& pair : myMap) {
-    //         if (pair.first == bike.bikeNumber) {
-    //             // std :: cout << "row = " << row++ << std :: endl;
-    //             if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
-    //                 std :: cout << "row = " << row++ << " is Skipped" << std :: endl;
-    //             }
-    //             else{
-    //                 node = nodes.Get(pair.second);
-    //                 waypointMobility = nodes.Get(pair.second)->GetObject<WaypointMobilityModel>();
-    //                 // Waypoint 1 - Start Position
-    //                 waypointMobility->AddWaypoint(Waypoint(Seconds(bike.started_at_unix), Vector(bike.start_lng, bike.start_lat, 0.0)));
-    //                 std :: cout << "Start WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl; 
-    //                 // Waypoint 2 - End Position                
-    //                 waypointMobility->AddWaypoint(Waypoint(Seconds(bike.ended_at_unix), Vector(bike.end_lng, bike.end_lat, 0.0)));
-    //                 std :: cout << "End WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row++ << std :: endl;
+    int row = 0; 
+    for (const BikeData& bike : dataset) {
+        for (const auto& pair : myMap) {
+            if (pair.first == bike.bikeNumber) {
+                // std :: cout << "row = " << row++ << std :: endl;
+                if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
+                    std :: cout << "row = " << row++ << " is Skipped" << std :: endl;
+                }
+                else{
+                    node = nodes.Get(pair.second);
+                    waypointMobility = nodes.Get(pair.second)->GetObject<WaypointMobilityModel>();
+                    // Waypoint 1 - Start Position
+                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.started_at_unix), Vector(bike.start_lng, bike.start_lat, 0.0)));
+                    std :: cout << "Start WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl; 
+                    // Waypoint 2 - End Position                
+                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.ended_at_unix), Vector(bike.end_lng, bike.end_lat, 0.0)));
+                    std :: cout << "End WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row++ << std :: endl;
                     
                     
-    //                 /***********************************************
-    //                 *      Saving Start time in map section        *
-    //                 ************************************************/
-    //                 if(!node_Map_StartTime.empty()){
-    //                     // Checking if the key exists using the find() function
-    //                     auto it = node_Map_StartTime.find(key);
-    //                     if (it != node_Map_StartTime.end()) {
-    //                         std::cout << "Key " << pair.second << " exists in the mapmap[node_Map_StartTime]" << std::endl;
-    //                     } 
-    //                     else {
-    //                         std::cout << "Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
-    //                         node_Map_StartTime.insert(std::make_pair(pair.second, bike.started_at_unix));
-    //                     }
-    //                 }
-    //                 else{
-    //                     node_Map_StartTime.insert(std::make_pair(pair.second, bike.started_at_unix));
-    //                     std::cout << "Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
-    //                 }
+                    /***********************************************
+                    *      Saving Start time in map section        *
+                    ************************************************/
+                    if(!node_Map_StartTime.empty()){
+                        // Checking if the key exists using the find() function
+                        auto it = node_Map_StartTime.find(key);
+                        if (it != node_Map_StartTime.end()) {
+                            std::cout << "Key " << pair.second << " exists in the mapmap[node_Map_StartTime]" << std::endl;
+                        } 
+                        else {
+                            std::cout << "Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
+                            node_Map_StartTime.insert(std::make_pair(pair.second, bike.started_at_unix));
+                        }
+                    }
+                    else{
+                        node_Map_StartTime.insert(std::make_pair(pair.second, bike.started_at_unix));
+                        std::cout << "Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
+                    }
 
-    //                 /***********************************************
-    //                 *      Saving End time in map section        *
-    //                 ************************************************/
-    //                 if(!node_Map_EndTime.empty()){
-    //                     // Checking if the key exists using the find() function
-    //                     auto it = node_Map_EndTime.find(key);
-    //                     if (it != node_Map_EndTime.end()) {
-    //                         if (node_Map_EndTime[pair.second] <= bike.ended_at_unix){
-    //                             node_Map_EndTime[pair.second] = bike.ended_at_unix; 
-    //                         }
-    //                         std::cout << "Key " << pair.second << " exists in the mapmap[node_Map_EndTime]" << std::endl;
-    //                     } 
-    //                     else {
-    //                         std::cout << "Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
-    //                         node_Map_EndTime.insert(std::make_pair(pair.second, bike.ended_at_unix));
-    //                     }
-    //                 }
-    //                 else{
-    //                     node_Map_EndTime.insert(std::make_pair(pair.second, bike.ended_at_unix));
-    //                     std::cout << "Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
-    //                 }
-    //                 std :: cout << "*****************************************************************" << std :: endl;
-    //             }
-    //         }
-    //     }
-    // }
+                    /***********************************************
+                    *      Saving End time in map section        *
+                    ************************************************/
+                    if(!node_Map_EndTime.empty()){
+                        // Checking if the key exists using the find() function
+                        auto it = node_Map_EndTime.find(key);
+                        if (it != node_Map_EndTime.end()) {
+                            if (node_Map_EndTime[pair.second] <= bike.ended_at_unix){
+                                node_Map_EndTime[pair.second] = bike.ended_at_unix; 
+                            }
+                            std::cout << "Key " << pair.second << " exists in the mapmap[node_Map_EndTime]" << std::endl;
+                        } 
+                        else {
+                            std::cout << "Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
+                            node_Map_EndTime.insert(std::make_pair(pair.second, bike.ended_at_unix));
+                        }
+                    }
+                    else{
+                        node_Map_EndTime.insert(std::make_pair(pair.second, bike.ended_at_unix));
+                        std::cout << "Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
+                    }
+                    std :: cout << "*****************************************************************" << std :: endl;
+                }
+            }
+        }
+    }
 
     /************************************************
      *     Section Just to verify Values            *
@@ -303,18 +305,18 @@ int main (int argc, char *argv[]) {
      ************************************************/
     
     // Loop through the nodes
-    // for (uint32_t i = 0; i < nodes.GetN(); i++){
-    //     //std::cout<<"Number = " << i << std :: endl;
-    //     // Create an instance of your application
-    //     node = nodes.Get(421);
-    //     Ptr<MyApplication> app = CreateObject<MyApplication>();
-    //     node->AddApplication(app);
-    //     app->SetNode(node);
+    for (const auto& pair : myMap) {
+        //std::cout<<"Number = " << i << std :: endl;
+        // Create an instance of your application
+        node = nodes.Get(pair.second);
+        Ptr<MyApplication> app = CreateObject<MyApplication>();
+        node->AddApplication(app);
+        app->SetNode(node);
 
-    //     // Configure and schedule events for your application
-    //     app->SetStartTime(Seconds(16339)); //startTime
-    //     app->SetStopTime(Seconds(16553)); //endTime
-    // }
+        // Configure and schedule events for your application
+        app->SetStartTime(Seconds(node_Map_StartTime[pair.second])); //startTime
+        app->SetStopTime(Seconds(node_Map_EndTime[pair.second])); //endTime
+    }
 
 
 
