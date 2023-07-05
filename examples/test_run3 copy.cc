@@ -173,7 +173,10 @@ void PrintNodePosition(Ptr<Node> node)
 
 int main (int argc, char *argv[]) {
     LogComponentEnable("MobilityTestRun", LOG_LEVEL_INFO);
-    
+
+    /************************************************
+     *     Saving data into vector and map Section  *
+     ************************************************/
     std::string filename = "scratch/output.csv";
     std::vector<BikeData> dataset = readDataset(filename);
 
@@ -198,29 +201,61 @@ int main (int argc, char *argv[]) {
     mobility.SetMobilityModel("ns3::WaypointMobilityModel");
     mobility.Install(nodes);
 
-    Ptr<WaypointMobilityModel> waypointMobility = nodes.Get(0)->GetObject<WaypointMobilityModel>();
-    waypointMobility->AddWaypoint(Waypoint(Seconds(10), Vector(0.0, 0.0, 0.0)));
-    waypointMobility->AddWaypoint(Waypoint(Seconds(20), Vector(100.0, 0.0, 0.0)));
-    waypointMobility->AddWaypoint(Waypoint(Seconds(30), Vector(100.0, 100.0, 0.0)));
-    Ptr<Node> node = nodes.Get(0);
-    Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
 
-    waypointMobility = nodes.Get(1)->GetObject<WaypointMobilityModel>();
-    waypointMobility->AddWaypoint(Waypoint(Seconds(5), Vector(10.0, 0.0, 0.0)));
-    waypointMobility->AddWaypoint(Waypoint(Seconds(10), Vector(0.0, 10.0, 0.0)));
-    waypointMobility->AddWaypoint(Waypoint(Seconds(15), Vector(10.0, 10.0, 0.0)));
-    node = nodes.Get(1);
+    /************************************************
+     *     Adding waypoints to nodes section        *
+     ************************************************/
+    Ptr<WaypointMobilityModel> waypointMobility;
+    Ptr<Node> node;
+    int row = 0; 
+    for (const BikeData& bike : dataset) {
+        for (const auto& pair : myMap) {
+            if (pair.first == bike.bikeNumber) {
+                // std :: cout << "row = " << row++ << std :: endl;
+                if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
+                    std :: cout << "row = " << row++ << " is Skipped" << std :: endl;
+                }
+                else{
+                    node = nodes.Get(pair.second);
+                    waypointMobility = nodes.Get(pair.second)->GetObject<WaypointMobilityModel>();
+                    // Waypoint 1 - Start Position
+                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.started_at_unix), Vector(bike.start_lng, bike.start_lat, 0.0)));
+                    std :: cout << "Start WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl; 
+                    // Waypoint 2 - End Position                
+                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.ended_at_unix), Vector(bike.end_lng, bike.end_lat, 0.0)));
+                    std :: cout << "End WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row++ << std :: endl;
+                }
+               
+            }
+        }
+    }  
+    
+          
 
-    Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
 
-    //bool flag = true;
-    // for(const BikeData& bike : dataset){
-    //     for(const auto& pair : myMap){
-    //         if(pair.first == bike.bikeNumber){
-                
-    //         }
-    //     }
-    // }
+
+
+
+    /************************************************
+     *  Example Section To Display Node Behaviour   *
+     ************************************************/
+    // Ptr<WaypointMobilityModel> waypointMobility = nodes.Get(0)->GetObject<WaypointMobilityModel>();
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(10), Vector(0.0, 0.0, 0.0)));
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(20), Vector(100.0, 0.0, 0.0)));
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(30), Vector(100.0, 100.0, 0.0)));
+    // Ptr<Node> node = nodes.Get(0);
+    // Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
+
+    // waypointMobility = nodes.Get(1)->GetObject<WaypointMobilityModel>();
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(5), Vector(10.0, 0.0, 0.0)));
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(10), Vector(0.0, 10.0, 0.0)));
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(15), Vector(10.0, 10.0, 0.0)));
+    // node = nodes.Get(1);
+
+    // Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
+ 
+
+    
     
     Time startTime = Seconds(0);
     Time endTime = Seconds(2713539);
