@@ -18,8 +18,8 @@ using namespace ns3;
 struct BikeData {
     std::string bikeNumber;
     int duration;
-    long started_at_unix; // now it is sec
-    long ended_at_unix; // now it is sec
+    long time_started; // now it is sec
+    long time_ended; // now it is sec
     int start_station;
     int end_station;
     double start_lat;
@@ -48,10 +48,10 @@ std::vector<BikeData> readDataset(const std::string& filename) {
             bikeData.duration = std::stoi(value);
 
             std::getline(ss, value, ',');
-            bikeData.started_at_unix = std::stol(value);
+            bikeData.time_started = std::stol(value);
 
             std::getline(ss, value, ',');
-            bikeData.ended_at_unix = std::stol(value);
+            bikeData.time_ended = std::stol(value);
 
             std::getline(ss, value, ',');
             bikeData.start_station = std::stoi(value);
@@ -233,10 +233,10 @@ int main (int argc, char *argv[]) {
                     node = nodes.Get(pair.second);
                     waypointMobility = nodes.Get(pair.second)->GetObject<WaypointMobilityModel>();
                     // Waypoint 1 - Start Position
-                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.started_at_unix), Vector(bike.start_lng, bike.start_lat, 0.0)));
+                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_started), Vector(bike.start_lng, bike.start_lat, 0.0)));
                     std :: cout << "Start WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl; 
                     // Waypoint 2 - End Position                
-                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.ended_at_unix), Vector(bike.end_lng, bike.end_lat, 0.0)));
+                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_ended), Vector(bike.end_lng, bike.end_lat, 0.0)));
                     std :: cout << "End WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row++ << std :: endl;
                     
                     
@@ -251,11 +251,11 @@ int main (int argc, char *argv[]) {
                         } 
                         else {
                             std::cout << "Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
-                            node_Map_StartTime.insert(std::make_pair(pair.second, bike.started_at_unix));
+                            node_Map_StartTime.insert(std::make_pair(pair.second, bike.time_started));
                         }
                     }
                     else{
-                        node_Map_StartTime.insert(std::make_pair(pair.second, bike.started_at_unix));
+                        node_Map_StartTime.insert(std::make_pair(pair.second, bike.time_started));
                         std::cout << "First Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
                     }
 
@@ -266,19 +266,19 @@ int main (int argc, char *argv[]) {
                         // Checking if the key exists using the find() function
                         auto it = node_Map_EndTime.find(pair.second);
                         if (it != node_Map_EndTime.end()) {
-                            if (node_Map_EndTime[pair.second] <= bike.ended_at_unix){
-                                std::cout << "Key " << pair.second << " is updated in the mapmap[node_Map_EndTime], From = " << node_Map_EndTime[pair.second] << " to " << bike.ended_at_unix << std::endl;
-                                node_Map_EndTime[pair.second] = bike.ended_at_unix; 
+                            if (node_Map_EndTime[pair.second] <= bike.time_ended){
+                                std::cout << "Key " << pair.second << " is updated in the mapmap[node_Map_EndTime], From = " << node_Map_EndTime[pair.second] << " to " << bike.time_ended << std::endl;
+                                node_Map_EndTime[pair.second] = bike.time_ended; 
                             }
                             std::cout << "Key " << pair.second << " exists in the mapmap[node_Map_EndTime]" << std::endl;
                         } 
                         else {
                             std::cout << "Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
-                            node_Map_EndTime.insert(std::make_pair(pair.second, bike.ended_at_unix));
+                            node_Map_EndTime.insert(std::make_pair(pair.second, bike.time_ended));
                         }
                     }
                     else{
-                        node_Map_EndTime.insert(std::make_pair(pair.second, bike.ended_at_unix));
+                        node_Map_EndTime.insert(std::make_pair(pair.second, bike.time_ended));
                         std::cout << "First Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
                     }
                     std :: cout << "*****************************************************************" << std :: endl;
