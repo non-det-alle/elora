@@ -141,23 +141,17 @@ void MyApplication::ScheduleNextPositionPrint() {
         Simulator::Cancel(m_printEvent);
     }
     else {
-        
-        if (waypointMobility->WaypointsLeft() %2 == 0){
-            if(waypointMobility->WaypointsLeft() == 0){
-                // std :: cout<<"Waypoint 0 not skipped" << std :: endl;
-                std::cout << "Waypoint Left = " << waypointMobility->WaypointsLeft() << std :: endl;
-                m_printEvent = Simulator::Schedule(Seconds(1), &MyApplication::PrintNodePosition, this);
-            }
-            else{
-                double nWInSec = waypointMobility->GetNextWaypoint().time.GetSeconds();
-                std::cout << "Waypoint Left = " << waypointMobility->WaypointsLeft() << std :: endl;
-                m_printEvent = Simulator::Schedule(Seconds(nWInSec), &MyApplication::PrintNodePosition, this);
-            }
+         if(waypointMobility->WaypointsLeft() %2 != 0){
+            std::cout << "Waypoint Left = " << waypointMobility->WaypointsLeft() << std :: endl; 
+            double time = Simulator::Now().GetSeconds();   
+            double nWInSec = waypointMobility->GetNextWaypoint().time.GetSeconds();
+            m_printEvent = Simulator::Schedule(Seconds(nWInSec - time), &MyApplication::PrintNodePosition, this);
         }
-        else{//60 * 60 * 24
-            std::cout << "Waypoint Left = " << waypointMobility->WaypointsLeft() << std :: endl;
+        else{
+            std::cout << "Waypoint Left = " << waypointMobility->WaypointsLeft() << std :: endl;    
+                           //60 * 60 * 24
             m_printEvent = Simulator::Schedule(Seconds(1), &MyApplication::PrintNodePosition, this);
-        }  
+        }     
     }
 }
 
@@ -243,6 +237,30 @@ int main (int argc, char *argv[]) {
 
     // Node Pointer
     Ptr<Node> node;
+
+    /************************************************
+     *  Example of 1 node with application class    *
+     ************************************************/
+    waypointMobility = nodes.Get(1)->GetObject<WaypointMobilityModel>();
+    waypointMobility->AddWaypoint(Waypoint(Seconds(0), Vector(0.0, 0.0, 0.0))); //5   start
+    waypointMobility->AddWaypoint(Waypoint(Seconds(10), Vector(0.0, 10.0, 0.0))); //4 end
+
+    waypointMobility->AddWaypoint(Waypoint(Seconds(20), Vector(0.0, 10.0, 0.0))); //3  start
+    waypointMobility->AddWaypoint(Waypoint(Seconds(30), Vector(100.0, 10.0, 0.0))); //2 end
+
+    waypointMobility->AddWaypoint(Waypoint(Seconds(40), Vector(100.0, 10.0, 0.0))); //1  start
+    waypointMobility->AddWaypoint(Waypoint(Seconds(50), Vector(100.0, 100.0, 0.0))); //0 end
+    node = nodes.Get(1);
+
+    //Create an instance of your application
+    Ptr<MyApplication> app = CreateObject<MyApplication>();
+    //Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);  
+    node->AddApplication(app);
+    app->SetNode(node);
+
+    // Configure and schedule events for your application
+    app->SetStartTime(Seconds(0)); //startTime
+    app->SetStopTime(Seconds(60)); //endTime
 
 
     /************************************************
@@ -331,8 +349,7 @@ int main (int argc, char *argv[]) {
 
     /************************************************
      *     Adding waypoints to nodes section        *
-     ************************************************/
-    
+     ************************************************/    
     // Loop through the nodes
     // for (const auto& pair : myMap) {
     //     //std::cout<<"Number = " << i << std :: endl;
@@ -341,54 +358,12 @@ int main (int argc, char *argv[]) {
     //     Ptr<MyApplication> app = CreateObject<MyApplication>();
     //     node->AddApplication(app);
     //     app->SetNode(node);
-
     //     // Configure and schedule events for your application
     //     app->SetStartTime(Seconds(node_Map_StartTime[pair.second])); //startTime
     //     app->SetStopTime(Seconds(node_Map_EndTime[pair.second])); //endTime
     // }
 
-
-
-
-
-    /************************************************
-     *  Example Section To Display Node Behaviour   *
-     ************************************************/
-    // Ptr<WaypointMobilityModel> waypointMobility = nodes.Get(0)->GetObject<WaypointMobilityModel>();
-    // waypointMobility->AddWaypoint(Waypoint(Seconds(10), Vector(0.0, 0.0, 0.0)));
-    // waypointMobility->AddWaypoint(Waypoint(Seconds(20), Vector(100.0, 0.0, 0.0)));
-    // waypointMobility->AddWaypoint(Waypoint(Seconds(30), Vector(100.0, 100.0, 0.0)));
-    // Ptr<Node> node = nodes.Get(0);
-    // Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
-
-    /************************************************
-     *  Example of 1 node with application class    *
-     ************************************************/
-    waypointMobility = nodes.Get(1)->GetObject<WaypointMobilityModel>();
-    waypointMobility->AddWaypoint(Waypoint(Seconds(0), Vector(0.0, 0.0, 0.0))); //2   start
-    waypointMobility->AddWaypoint(Waypoint(Seconds(10), Vector(0.0, 10.0, 0.0))); //1 end
-    waypointMobility->AddWaypoint(Waypoint(Seconds(20), Vector(0.0, 10.0, 0.0))); //0  start
-    waypointMobility->AddWaypoint(Waypoint(Seconds(30), Vector(100.0, 10.0, 0.0))); //0 end
-    waypointMobility->AddWaypoint(Waypoint(Seconds(40), Vector(100.0, 10.0, 0.0))); //0  start
-    waypointMobility->AddWaypoint(Waypoint(Seconds(50), Vector(100.0, 100.0, 0.0))); //0 end
-    node = nodes.Get(1);
-
-    //Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
-
-    //Create an instance of your application
-    node = nodes.Get(1);
-    Ptr<MyApplication> app = CreateObject<MyApplication>();
-    Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
-    // node->AddApplication(app);
-    // app->SetNode(node);
-
-    // // Configure and schedule events for your application
-    // app->SetStartTime(Seconds(0)); //startTime
-    // app->SetStopTime(Seconds(50)); //endTime
  
-
-    
-    
     Time startTime = Seconds(0);
     Time endTime = Seconds(2713539); //2713539
     std :: cout << "*****************************************************************" << std :: endl;
