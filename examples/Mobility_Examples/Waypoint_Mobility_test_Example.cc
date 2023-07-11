@@ -7,8 +7,10 @@
 #include "ns3/internet-module.h"
 #include "ns3/point-to-point-module.h"
 
+#include "ns3/bike-application.h"
 
-NS_LOG_COMPONENT_DEFINE("MobilityTestRun");
+
+NS_LOG_COMPONENT_DEFINE("WaypointMobility");
 
 using namespace ns3;
 
@@ -83,90 +85,6 @@ std::vector<BikeData> readDataset(const std::string& filename) {
     return dataset;
 }
 
-    /***************************
-     *      MY Application     *
-     ***************************/
-class BikeApplication : public Application {
-public:
-    static TypeId GetTypeId();
-
-    BikeApplication();
-    virtual ~BikeApplication();
-
-    void SetNode(Ptr<Node> node);  // New function to set the node
-    void PrintNodePosition();      // New function to print node position
-
-private:
-    virtual void StartApplication();
-    virtual void StopApplication();
-    void ScheduleNextPositionPrint();  // New function to schedule next position print
-
-    Ptr<Node> m_node;      // Node pointer
-    EventId m_printEvent;  // EventId for the periodic printing
-};
-
-TypeId BikeApplication::GetTypeId() {
-    static TypeId tid = TypeId("BikeApplication")
-        .SetParent<Application>()
-        .AddConstructor<BikeApplication>();
-    return tid;
-}
-
-BikeApplication::BikeApplication() : m_node(nullptr), m_printEvent() {}
-
-BikeApplication::~BikeApplication() {}
-
-void BikeApplication::SetNode(Ptr<Node> node) {
-    m_node = node;
-}
-
-void BikeApplication::PrintNodePosition() {
-    if (m_node) {
-        Ptr<WaypointMobilityModel> waypointMobility = m_node->GetObject<WaypointMobilityModel>();
-        NS_LOG_INFO("NODE ID:  " << m_node->GetId() << " | Node position: " << waypointMobility->GetPosition() << " , Time is : " << Simulator::Now().GetSeconds());
-        // std :: cout << "NODE ID:  " << m_node->GetId() << " | Node position: " << waypointMobility->GetPosition() << " , Time is : " << Simulator::Now().GetSeconds() << std :: endl;
-        // std::cout << "Waypoint Left = " << waypointMobility->WaypointsLeft() << std :: endl;
-        // Get the next waypoint time in sec
-        // double nextWaypointInSeconds = waypointMobility->GetNextWaypoint().time.GetSeconds();
-        // std::cout << "Next Waypoint arrival Time = " << nextWaypointInSeconds << " , Time is : " << Simulator::Now().GetSeconds() << std :: endl;
-        std :: cout<<"_____________________________________________________" << std :: endl;
-
-        ScheduleNextPositionPrint();
-    }
-}
-
-void BikeApplication::ScheduleNextPositionPrint() {
-    Ptr<WaypointMobilityModel> waypointMobility = m_node->GetObject<WaypointMobilityModel>();
-    if(waypointMobility->WaypointsLeft() == 0 && waypointMobility->GetVelocity() == Vector3D(0, 0, 0)){
-        Simulator::Cancel(m_printEvent);
-    }
-    else {
-         if(waypointMobility->WaypointsLeft() %2 != 0){
-            std::cout << "Waypoint Left = " << waypointMobility->WaypointsLeft() << std :: endl; 
-            double time = Simulator::Now().GetSeconds();   
-            double nWInSec = waypointMobility->GetNextWaypoint().time.GetSeconds();
-            m_printEvent = Simulator::Schedule(Seconds(nWInSec - time), &BikeApplication::PrintNodePosition, this);
-        }
-        else{
-            std::cout << "Waypoint Left = " << waypointMobility->WaypointsLeft() << std :: endl;    
-                           //60 * 60 * 24
-            m_printEvent = Simulator::Schedule(Seconds(1), &BikeApplication::PrintNodePosition, this);
-        }     
-    }
-}
-
-void BikeApplication::StartApplication() {
-    NS_LOG_INFO("BikeApplication::StartApplication called for node = "  << m_node->GetId());
-    //std :: cout << "BikeApplication::StartApplication called for node = "  << m_node->GetId() << std :: endl;
-    ScheduleNextPositionPrint();  // Schedule the first position print
-}
-
-void BikeApplication::StopApplication() {
-    NS_LOG_INFO("BikeApplication::StopApplication called for node = " << m_node->GetId());
-    //std :: cout << "BikeApplication::StopApplication called for node = " << m_node->GetId() << std :: endl; 
-    Simulator::Cancel(m_printEvent);  // Cancel the position print event
-}
-
 
 void PrintNodePosition(Ptr<Node> node)
 {
@@ -196,7 +114,9 @@ void PrintNodePosition(Ptr<Node> node)
      ***************************/
 
 int main (int argc, char *argv[]) {
-    LogComponentEnable("MobilityTestRun", LOG_LEVEL_INFO);
+    LogComponentEnable("WaypointMobility", LOG_LEVEL_INFO);
+    LogComponentEnable("BikeApplication", LOG_LEVEL_INFO);
+    
 
     /************************************************
      *     Saving data into vector and map Section  *
@@ -253,13 +173,15 @@ int main (int argc, char *argv[]) {
     node = nodes.Get(1);
 
     //Create an instance of your application
-    Ptr<BikeApplication> app = CreateObject<BikeApplication>();
-    //Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);  
+    Ptr<ns3::lorawan::BikeApplication> app = CreateObject<ns3::lorawan::BikeApplication>();
+    // Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);  
     node->AddApplication(app);
     app->SetNode(node);
 
-    // Configure and schedule events for your application
+    // // Configure and schedule events for your application
     app->SetStartTime(Seconds(0)); //startTime
+
+
     app->SetStopTime(Seconds(60)); //endTime
 
 
