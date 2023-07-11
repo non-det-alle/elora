@@ -125,3 +125,11 @@ build_lib_example(
     ${libcore}
     ${liblorawan}
 )
+
+build_lib_example(
+  NAME test_ex
+  SOURCE_FILES Mobility_Examples/test_ex.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
+)
