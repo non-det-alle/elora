@@ -158,6 +158,9 @@ int main (int argc, char *argv[]) {
     // Node Pointer
     Ptr<Node> node;
 
+    //Create an instance of your application
+    Ptr<ns3::lorawan::BikeApplication> app = CreateObject<ns3::lorawan::BikeApplication>();
+
     /************************************************
      *  Example of 1 node with application class    *
      ************************************************/
@@ -172,8 +175,6 @@ int main (int argc, char *argv[]) {
     waypointMobility->AddWaypoint(Waypoint(Seconds(50), Vector(100.0, 100.0, 0.0))); //0 end
     node = nodes.Get(1);
 
-    //Create an instance of your application
-    Ptr<ns3::lorawan::BikeApplication> app = CreateObject<ns3::lorawan::BikeApplication>();
     // Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);  
     node->AddApplication(app);
     app->SetNode(node);
