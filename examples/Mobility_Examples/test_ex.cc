@@ -2,112 +2,15 @@
 #include "ns3/mobility-module.h"
 #include "ns3/network-module.h"
 #include "ns3/applications-module.h"
-
-#include "ns3/applications-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/point-to-point-module.h"
 
 #include "ns3/bike-application.h"
-
+#include "ns3/bike-mobility-helper.h"
 
 NS_LOG_COMPONENT_DEFINE("WaypointMobility");
 
 using namespace ns3;
-
-    /***************************
-     *      Bike Struture      *
-     ***************************/
-struct BikeData {
-    std::string bikeNumber;
-    int duration;
-    long time_started; // now it is sec
-    long time_ended; // now it is sec
-    int start_station;
-    int end_station;
-    double start_lat;
-    double start_lng;
-    double end_lat;
-    double end_lng; 
-};
-
-std::vector<BikeData> readDataset(const std::string& filename) {
-    std::vector<BikeData> dataset;
-    std::ifstream file(filename);
-
-    if (file) {
-        std::string line;
-        std::getline(file, line); // Skip header line
-
-        while (std::getline(file, line)) {
-            std::stringstream ss(line);
-            std::string value;
-            BikeData bikeData;
-
-            std::getline(ss, value, ',');
-            bikeData.bikeNumber = value;
-
-            std::getline(ss, value, ',');
-            bikeData.duration = std::stoi(value);
-
-            std::getline(ss, value, ',');
-            bikeData.time_started = std::stol(value);
-
-            std::getline(ss, value, ',');
-            bikeData.time_ended = std::stol(value);
-
-            std::getline(ss, value, ',');
-            bikeData.start_station = std::stoi(value);
-
-            std::getline(ss, value, ',');
-            bikeData.end_station = std::stoi(value);
-
-            std::getline(ss, value, ',');
-            bikeData.start_lat = std::stod(value);
-
-            std::getline(ss, value, ',');
-            bikeData.start_lng = std::stod(value);
-
-            std::getline(ss, value, ',');
-            bikeData.end_lat = std::stod(value);
-
-            std::getline(ss, value);
-            bikeData.end_lng = std::stod(value);
-
-            dataset.push_back(bikeData);
-        }
-
-        file.close();
-    }
-    else {
-        std::cerr << "Failed to open the file: " << filename << std::endl;
-    }
-
-    return dataset;
-}
-
-
-void PrintNodePosition(Ptr<Node> node)
-{
-    
-    Ptr<WaypointMobilityModel> waypointMobility = node->GetObject<WaypointMobilityModel>();
-    Vector3D position = waypointMobility->GetPosition();
-    double time = Simulator::Now().GetSeconds();
-    std::cout << "Node ID : " << node->GetId() << ", Node position at time " << time << ": (" << position.x << ", " << position.y << ", " << position.z << ")" << std::endl;
-    std::cout << "Waypoint Left = " << waypointMobility->WaypointsLeft() << std :: endl;
-    double nWInSec = waypointMobility->GetNextWaypoint().time.GetSeconds();
-    std::cout << "Next Waypoint Time = " << nWInSec << std :: endl;
-    if(waypointMobility->WaypointsLeft() == 0 && waypointMobility->GetVelocity() == Vector3D(0, 0, 0)){
-        Simulator::Stop();
-    }
-    else {
-        if(waypointMobility->WaypointsLeft() %2 != 0){
-            Simulator::Schedule(Seconds(nWInSec - time), &PrintNodePosition, node);
-        }
-        else{
-            Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);
-        }     
-    }
-}
 
     /***************************
      *         MAIN            *
@@ -116,7 +19,6 @@ void PrintNodePosition(Ptr<Node> node)
 int main (int argc, char *argv[]) {
     LogComponentEnable("WaypointMobility", LOG_LEVEL_INFO);
     LogComponentEnable("BikeApplication", LOG_LEVEL_INFO);
-    
 
     /************************************************
      *     Saving data into vector and map Section  *
@@ -125,25 +27,10 @@ int main (int argc, char *argv[]) {
     std::vector<BikeData> dataset = readDataset(filename);
 
     // Map
-    std::map<std::string, int> myMap;
+    std::map<std::string, int> myMap = createBikeNumberMap(dataset);
     std::map<long, int> node_Map_StartTime;
     std::map<long, int> node_Map_EndTime;
 
-    // Set
-    std::set<std::string> uniqueBikeNumbers;
-
-
-    for (const BikeData& data : dataset) {
-        uniqueBikeNumbers.insert(data.bikeNumber);
-    }
-
-    int key = 0; // For myMap
-    for (const std::string& bikeNumber : uniqueBikeNumbers) {
-        myMap[bikeNumber] = key++; // Assigning the key
-    }
-
-    
-    
     // Create nodes
     NodeContainer nodes;
     nodes.Create(myMap.size());
@@ -179,7 +66,7 @@ int main (int argc, char *argv[]) {
     node->AddApplication(app);
     app->SetNode(node);
 
-    // // Configure and schedule events for your application
+    // Configure and schedule events for your application
     app->SetStartTime(Seconds(0)); //startTime
 
 
