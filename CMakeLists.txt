@@ -19,7 +19,7 @@ set(source_files
     model/mac/lorawan-mac.cc
     model/mac/gateway-lorawan-mac.cc
     model/mac/base-end-device-lorawan-mac.cc
-    model/mac/class-a-end-device-lorawan-mac.cc
+    model/mac/class-a-end-device-lorawan-mac.cc 
     model/mac/recv-window-manager.cc
     model/mac/lora-device-address.cc
     model/mac/lora-device-address-generator.cc
@@ -50,6 +50,7 @@ set(source_files
     helper/lora-radio-energy-model-helper.cc
     helper/network-server-helper.cc
     helper/forwarder-helper.cc
+    helper/bike-mobility-helper.cc  #new file
     helper/udp-forwarder-helper.cc
     helper/periodic-sender-helper.cc
     helper/one-shot-sender-helper.cc
@@ -116,6 +117,7 @@ set(header_files
     helper/lora-radio-energy-model-helper.h
     helper/network-server-helper.h
     helper/forwarder-helper.h
+    helper/bike-mobility-helper.h #new file
     helper/udp-forwarder-helper.h
     helper/periodic-sender-helper.h
     helper/one-shot-sender-helper.h
