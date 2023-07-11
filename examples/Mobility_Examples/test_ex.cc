@@ -16,6 +16,37 @@ using namespace ns3;
      *         MAIN            *
      ***************************/
 
+// ns3::Ptr<ns3::WaypointMobilityModel> SaveWaypoints(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap, NodeContainer nodes){
+//     Ptr<WaypointMobilityModel> waypointMobility;
+
+//     int row = 0; 
+//     for (const BikeData& bike : dataset) {
+//         for (const auto& pair : myMap) {
+//             if (pair.first == bike.bikeNumber) {
+//                 // std :: cout << "row = " << row++ << std :: endl;
+//                 if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
+//                     std :: cout << "row = " << row << " is Skipped" << std :: endl;
+//                     row++;
+//                 }
+//                 else{
+//                     //node = nodes.Get(pair.second);
+//                     waypointMobility = nodes.Get(pair.second)->GetObject<WaypointMobilityModel>();
+//                     // Waypoint 1 - Start Position
+//                     waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_started), Vector(bike.start_lng, bike.start_lat, 0.0)));
+//                     //std :: cout << "Start WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl; 
+//                     // Waypoint 2 - End Position                
+//                     waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_ended), Vector(bike.end_lng, bike.end_lat, 0.0)));
+//                     //std :: cout << "End WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl;
+//                     row++;
+//                     //std :: cout << "*****************************************************************" << std :: endl;
+//                 }
+//             }
+//         }
+//     }
+
+//     return waypointMobility;
+// }
+
 int main (int argc, char *argv[]) {
     LogComponentEnable("WaypointMobility", LOG_LEVEL_INFO);
     LogComponentEnable("BikeApplication", LOG_LEVEL_INFO);
@@ -40,7 +71,7 @@ int main (int argc, char *argv[]) {
     mobility.Install(nodes);
 
     // Mobility Pointer
-    Ptr<WaypointMobilityModel> waypointMobility;
+    Ptr<WaypointMobilityModel> waypointMobility = SaveWaypoints(dataset, myMap, nodes);
 
     // Node Pointer
     Ptr<Node> node;
@@ -51,26 +82,26 @@ int main (int argc, char *argv[]) {
     /************************************************
      *  Example of 1 node with application class    *
      ************************************************/
-    waypointMobility = nodes.Get(1)->GetObject<WaypointMobilityModel>();
-    waypointMobility->AddWaypoint(Waypoint(Seconds(0), Vector(0.0, 0.0, 0.0))); //5   start
-    waypointMobility->AddWaypoint(Waypoint(Seconds(10), Vector(0.0, 10.0, 0.0))); //4 end
+    // waypointMobility = nodes.Get(1)->GetObject<WaypointMobilityModel>();
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(0), Vector(0.0, 0.0, 0.0))); //5   start
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(10), Vector(0.0, 10.0, 0.0))); //4 end
 
-    waypointMobility->AddWaypoint(Waypoint(Seconds(20), Vector(0.0, 10.0, 0.0))); //3  start
-    waypointMobility->AddWaypoint(Waypoint(Seconds(30), Vector(100.0, 10.0, 0.0))); //2 end
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(20), Vector(0.0, 10.0, 0.0))); //3  start
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(30), Vector(100.0, 10.0, 0.0))); //2 end
 
-    waypointMobility->AddWaypoint(Waypoint(Seconds(40), Vector(100.0, 10.0, 0.0))); //1  start
-    waypointMobility->AddWaypoint(Waypoint(Seconds(50), Vector(100.0, 100.0, 0.0))); //0 end
-    node = nodes.Get(1);
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(40), Vector(100.0, 10.0, 0.0))); //1  start
+    // waypointMobility->AddWaypoint(Waypoint(Seconds(50), Vector(100.0, 100.0, 0.0))); //0 end
+    // node = nodes.Get(1);
 
-    // Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);  
-    node->AddApplication(app);
-    app->SetNode(node);
+    // // Simulator::Schedule(Seconds(1.0), &PrintNodePosition, node);  
+    // node->AddApplication(app);
+    // app->SetNode(node);
 
-    // Configure and schedule events for your application
-    app->SetStartTime(Seconds(0)); //startTime
+    // // Configure and schedule events for your application
+    // app->SetStartTime(Seconds(0)); //startTime
 
 
-    app->SetStopTime(Seconds(60)); //endTime
+    // app->SetStopTime(Seconds(60)); //endTime
 
 
     /************************************************
@@ -117,7 +148,7 @@ int main (int argc, char *argv[]) {
     //                 }
 
     //                 /***********************************************
-    //                 *      Saving End time in map section        *
+    //                 *      Saving End time in map section          *
     //                 ************************************************/
     //                 if(!node_Map_EndTime.empty()){
     //                     // Checking if the key exists using the find() function
