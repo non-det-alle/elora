@@ -4,6 +4,8 @@
 #define BIKE_APPLICATION_H
 
 #include "ns3/lora-application.h"
+#include "ns3/mobility-module.h"
+#include "ns3/simulator.h"
 
 namespace ns3
 {
@@ -37,4 +39,4 @@ class BikeApplication : public Application
 } // namespace lorawan
 
 } // namespace ns3
-#endif /* SENDER_APPLICATION */
+#endif /* BIKE_APPLICATION  */
