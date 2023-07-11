@@ -101,6 +101,7 @@ createBikeNumberMap(const std::vector<BikeData>& dataset) {
     return myMap;
 }
 
+// function to return the waypoint mobility object
 ns3::Ptr<ns3::WaypointMobilityModel> 
 SaveWaypoints(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap, ns3::NodeContainer nodes){
     Ptr<ns3::WaypointMobilityModel> waypointMobility;
@@ -133,6 +134,92 @@ SaveWaypoints(const std::vector<BikeData>& dataset, const std::map<std::string, 
     return waypointMobility;
 }
 
+// Helper function to map start time of node
+std::map<long, int> 
+start_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap) {
+    std::map<long, int> node_Map_StartTime;
+    int row = 0; 
+    for (const BikeData& bike : dataset) {
+        for (const auto& pair : myMap) {
+            if (pair.first == bike.bikeNumber) {
+                // std :: cout << "row = " << row++ << std :: endl;
+                if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
+                    //std :: cout << "row = " << row << " is Skipped" << std :: endl;
+                    row++;
+                }
+                else{                   
+                    row++;                    
+                    /***********************************************
+                    *      Saving Start time in map section        *
+                    ************************************************/
+                    if(!node_Map_StartTime.empty()){
+                        // Checking if the key exists using the find() function
+                        auto it = node_Map_StartTime.find(pair.second);
+                        if (it != node_Map_StartTime.end()) {
+                            //std::cout << "Key " << pair.second << " exists in the mapmap[node_Map_StartTime]" << std::endl;
+                        } 
+                        else {
+                            //std::cout << "Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
+                            node_Map_StartTime.insert(std::make_pair(pair.second, bike.time_started));
+                        }
+                    }
+                    else{
+                        node_Map_StartTime.insert(std::make_pair(pair.second, bike.time_started));
+                        //std::cout << "First Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
+                    }
+                    //std :: cout << "*****************************************************************" << std :: endl;
+                }
+            }
+        }
+    }
+
+    return node_Map_StartTime;
+}
+
+// Helper function to map end time of node
+std::map<long, int> 
+end_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap) {
+    std::map<long, int> node_Map_EndTime;
+    int row = 0; 
+    for (const BikeData& bike : dataset) {
+        for (const auto& pair : myMap) {
+            if (pair.first == bike.bikeNumber) {
+                // std :: cout << "row = " << row++ << std :: endl;
+                if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
+                    //std :: cout << "row = " << row << " is Skipped" << std :: endl;
+                    row++;
+                }
+                else{                   
+                    row++;                    
+                    /***********************************************
+                    *      Saving End time in map section          *
+                    ************************************************/
+                    if(!node_Map_EndTime.empty()){
+                        // Checking if the key exists using the find() function
+                        auto it = node_Map_EndTime.find(pair.second);
+                        if (it != node_Map_EndTime.end()) {
+                            if (node_Map_EndTime[pair.second] <= bike.time_ended){
+                                //std::cout << "Key " << pair.second << " is updated in the mapmap[node_Map_EndTime], From = " << node_Map_EndTime[pair.second] << " to " << bike.time_ended << std::endl;
+                                node_Map_EndTime[pair.second] = bike.time_ended; 
+                            }
+                            //std::cout << "Key " << pair.second << " exists in the mapmap[node_Map_EndTime]" << std::endl;
+                        } 
+                        else {
+                            //std::cout << "Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
+                            node_Map_EndTime.insert(std::make_pair(pair.second, bike.time_ended));
+                        }
+                    }
+                    else{
+                        node_Map_EndTime.insert(std::make_pair(pair.second, bike.time_ended));
+                        //std::cout << "First Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
+                    }
+                    //std :: cout << "*****************************************************************" << std :: endl;
+                }
+            }
+        }
+    }
+    return node_Map_EndTime;
+}
 
 
 
