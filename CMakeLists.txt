@@ -9,6 +9,7 @@ set(source_files
     model/app/server/network-controller.cc
     model/app/server/network-controller-components.cc
     model/app/server/adr-component.cc
+    model/app/bike-application.cc #new entry
     model/app/forwarder.cc
     model/app/udp-forwarder.cc
     model/app/lora-application.cc
@@ -74,6 +75,7 @@ set(header_files
     model/app/server/network-controller.h
     model/app/server/network-controller-components.h
     model/app/server/adr-component.h
+    model/app/bike-application.h #new entry
     model/app/forwarder.h
     model/app/udp-forwarder.h
     model/app/lora-application.h
