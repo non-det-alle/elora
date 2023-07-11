@@ -1,8 +1,7 @@
 
 
 #include "bike-application.h"
-#include "ns3/mobility-module.h"
-#include "ns3/simulator.h"
+
 
 namespace ns3
 {
