@@ -36,5 +36,8 @@ std::map<std::string, int> createBikeNumberMap(const std::vector<BikeData>& data
 
 ns3::Ptr<ns3::WaypointMobilityModel> SaveWaypoints(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap, ns3::NodeContainer nodes);
 
+std::map<long, int> start_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap);
+
+std::map<long, int> end_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap);
 
 #endif  // BIKE_MOBILITY_HELPER_H
