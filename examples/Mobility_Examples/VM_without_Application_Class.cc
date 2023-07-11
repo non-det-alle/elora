@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
     LogComponentEnable("MobilityTestRun", LOG_LEVEL_INFO);
 
     //loading data from file
-    std::string filename = "scratch/test_data.csv";
+    std::string filename = "contrib/lorawan/examples/Mobility_Examples/Data_Set/test_data.csv";
     std::vector<Bike> bikes = loadBikeDataFromFile(filename);
 
     // Create a Node container

@@ -9,9 +9,10 @@ NS_LOG_COMPONENT_DEFINE("MobilityTestRun");
 using namespace ns3;
 
 
-    /***************************
-     *      Bike Struture      *
-     ***************************/
+/*
+                    Structure for Bike Data
+
+*/
 struct BikeData {
     std::string bikeNumber;
     int duration;
@@ -80,9 +81,10 @@ std::vector<BikeData> readDataset(const std::string& filename) {
     return dataset;
 }
 
-    /***************************
-     *      MY Application     *
-     ***************************/
+/*
+                    Application Class
+
+*/
 class MyApplication : public Application {
 public:
     static TypeId GetTypeId();
@@ -109,7 +111,7 @@ TypeId MyApplication::GetTypeId() {
     return tid;
 }
 
-MyApplication::MyApplication() : m_node(nullptr), m_printEvent() {}
+MyApplication::MyApplication() : m_node(0), m_printEvent() {}
 
 MyApplication::~MyApplication() {}
 
@@ -119,11 +121,9 @@ void MyApplication::SetNode(Ptr<Node> node) {
 
 void MyApplication::PrintNodePosition() {
     if (m_node) {
-        //Vector position = m_node->GetObject<MobilityModel>()->GetPosition();
-        //NS_LOG_INFO("Node ID: " << m_node->GetId() << ", Position: " << position.x << ", " << position.y << ", " << position.z);
-        Ptr<ConstantVelocityMobilityModel> cvmm = m_node->GetObject<ConstantVelocityMobilityModel>();
-        NS_LOG_INFO("NODE ID:  " << m_node->GetId() << " | Node position: " << cvmm->GetPosition());
-        
+        Vector position = m_node->GetObject<MobilityModel>()->GetPosition();
+        NS_LOG_INFO("Node position: " << position.x << ", " << position.y << ", " << position.z);
+
         ScheduleNextPositionPrint();
     }
 }
@@ -142,62 +142,17 @@ void MyApplication::StopApplication() {
     Simulator::Cancel(m_printEvent);  // Cancel the position print event
 }
 
-    /***************************
-     *         MAIN            *
-     ***************************/
+/*
+                    Main
+
+*/
 
 int main (int argc, char *argv[]) {
     LogComponentEnable("MobilityTestRun", LOG_LEVEL_INFO);
     
-    std::string filename = "scratch/filtered_data.csv";
+    std::string filename = "contrib/lorawan/examples/Mobility_Examples/Data_Set/filtered_data.csv";
     std::vector<BikeData> dataset = readDataset(filename);
-
-    // Map
-    std::map<std::string, int> myMap;
-    std::set<std::string> uniqueBikeNumbers;
-
-    for (const BikeData& data : dataset) {
-        uniqueBikeNumbers.insert(data.bikeNumber);
-    }
-
-    int key = 0;
-    for (const std::string& bikeNumber : uniqueBikeNumbers) {
-        myMap[bikeNumber] = key++; // Assigning the key without counting
-    }
-
-    // Create nodes
-    NodeContainer nodes;
-    nodes.Create(myMap.size());
-
-    MobilityHelper mobility;
-    mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel");
-    mobility.Install(nodes);
     
-    // Create an instance of your application
-    Ptr<MyApplication> app = CreateObject<MyApplication>();
-
-    for (const BikeData& bike : dataset) {
-        for (const auto& pair : myMap) {
-            if (pair.first == bike.bikeNumber) {
-                Ptr<Node> node = nodes.Get(pair.second);
-                Vector velocity((bike.end_lng - bike.start_lng) / bike.duration, (bike.end_lat - bike.start_lat) / bike.duration, 0.0);
-                Ptr<ConstantVelocityMobilityModel> cvmm = nodes.Get(pair.second)->GetObject<ConstantVelocityMobilityModel>();
-                cvmm->SetVelocity(velocity);
-
-                
-                if(pair.first == "W00581"){
-                    std :: cout << "\nNode : " << pair.second << " ,Node Velocity: (" << (bike.end_lng - bike.start_lng) / bike.duration << ", " << (bike.end_lat - bike.start_lat) / bike.duration << ", " << "0.0" << ")" << std :: endl;
-                    node->AddApplication(app);
-                    app->SetNode(node);
-                    // Configure and schedule events for your application
-                    app->SetStartTime(Seconds(1.0)); //startTime
-                    app->SetStopTime(Seconds(10.0)); //endTime
-                }
-            }
-        }
-    }
-
-  
     uint32_t startTimeUnix = 1577836859;  // GMT: Wednesday, January 1, 2020 12:00:59 AM
     uint32_t stopTimeUnix = 1580515175;   // GMT: Friday, January 31, 2020 11:59:35 PM
 
@@ -205,11 +160,49 @@ int main (int argc, char *argv[]) {
     Time startTime = Seconds(startTimeUnix);
     Time endTime = Seconds(stopTimeUnix);
 
-    std::cout << "\nStart Time : " << startTime << std::endl;
+    // Create nodes
+    NodeContainer nodes;
+    nodes.Create(1);
+
+    // Create mobility model and set waypoints
+
+    // Create a Mobility model and install it on the nodes
+    MobilityHelper mobility;
+    mobility.SetMobilityModel("ns3::WaypointMobilityModel");
+    mobility.Install(nodes);
+
+    // Add waypoints for node 1
+    Vector waypoint1_1(0.0, 0.0, 0.0);
+    Vector waypoint1_2(10.0, 0.0, 0.0);   // Modified position
+    Vector waypoint1_3(100.0, 100.0, 0.0);
+    Vector waypoint1_4(0.0, 100.0, 0.0);
+
+    
+    
+    Ptr<WaypointMobilityModel> waypointMobility1 = nodes.Get(0)->GetObject<WaypointMobilityModel>();
+
+    waypointMobility1->AddWaypoint(Waypoint(Seconds(0.0), waypoint1_1));
+    waypointMobility1->AddWaypoint(Waypoint(Seconds(10.0), waypoint1_2));
+    waypointMobility1->AddWaypoint(Waypoint(Seconds(20.0), waypoint1_3));
+    waypointMobility1->AddWaypoint(Waypoint(Seconds(40.0), waypoint1_4));
+
+    Ptr<Node> node = nodes.Get(0);
+
+    // Create an instance of your application
+    Ptr<MyApplication> app = CreateObject<MyApplication>();
+
+    // Attach the application to the node
+    node->AddApplication(app);
+    app->SetNode(node);  // Set the node for the application
+
+    std::cout << "Start Time : " << startTime << std::endl;
     std::cout << "End Time : " << endTime << std::endl;
     std::cout << "Difference : " <<  endTime - startTime << " | approx. 30 days" << std::endl;
 
-    Simulator::Stop(Seconds(50.0)); // Set the overall simulation end time
+    // Configure and schedule events for your application
+    app->SetStartTime(Seconds(0.0)); //startTime
+    app->SetStopTime(Seconds(41.0)); //endTime
+
     // Run the simulation
     Simulator::Run();
     Simulator::Destroy();

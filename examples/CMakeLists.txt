@@ -77,3 +77,11 @@ build_lib_example(
     ${libcore}
     ${liblorawan}
 )
+
+# build_lib_example(
+#   NAME Waypoint_Mobility_test_Example
+#   SOURCE_FILES Waypoint_Mobility_test_Example copy.cc
+#   LIBRARIES_TO_LINK
+#     ${libcore}
+#     ${liblorawan}
+# )

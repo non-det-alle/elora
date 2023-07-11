@@ -76,7 +76,7 @@ int main(int argc, char* argv[]){
     CommandLine cmd(__FILE__);
     cmd.Parse(argc, argv);
 
-    std::string filename = "scratch/data_set_test.csv";
+    std::string filename = "contrib/lorawan/examples/Mobility_Examples/Data_Set/data_set_test.csv";
     std::vector<BikeData> dataset = readDataset(filename);
 
     Time::SetResolution(Time::NS);
