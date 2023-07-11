@@ -101,5 +101,38 @@ createBikeNumberMap(const std::vector<BikeData>& dataset) {
     return myMap;
 }
 
+ns3::Ptr<ns3::WaypointMobilityModel> 
+SaveWaypoints(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap, ns3::NodeContainer nodes){
+    Ptr<ns3::WaypointMobilityModel> waypointMobility;
+
+    int row = 0; 
+    for (const BikeData& bike : dataset) {
+        for (const auto& pair : myMap) {
+            if (pair.first == bike.bikeNumber) {
+                // std :: cout << "row = " << row++ << std :: endl;
+                if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
+                    std :: cout << "row = " << row << " is Skipped" << std :: endl;
+                    row++;
+                }
+                else{
+                    //node = nodes.Get(pair.second);
+                    waypointMobility = nodes.Get(pair.second)->GetObject<ns3::WaypointMobilityModel>();
+                    // Waypoint 1 - Start Position
+                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_started), Vector(bike.start_lng, bike.start_lat, 0.0)));
+                    //std :: cout << "Start WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl; 
+                    // Waypoint 2 - End Position                
+                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_ended), Vector(bike.end_lng, bike.end_lat, 0.0)));
+                    //std :: cout << "End WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl;
+                    row++;
+                    //std :: cout << "*****************************************************************" << std :: endl;
+                }
+            }
+        }
+    }
+
+    return waypointMobility;
+}
+
+
 
 
