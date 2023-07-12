@@ -133,16 +133,16 @@ main(int argc, char* argv[])
         hexAllocator->SetAttribute("distance", DoubleValue(gatewayDistance));
         mobilityGw.SetPositionAllocator(hexAllocator);
 
-        // End Device mobility
-        mobilityEd.SetMobilityModel("ns3::ConstantPositionMobilityModel");
-        // We define rho to generalize the allocation disk for any number of gateway rings
-        double rho = range + 2.0 * gatewayDistance * (gatewayRings - 1);
-        rangeAllocator = CreateObject<RangePositionAllocator>();
-        rangeAllocator->SetAttribute("rho", DoubleValue(rho));
-        rangeAllocator->SetAttribute("ZRV",
-                                     StringValue("ns3::UniformRandomVariable[Min=1|Max=10]"));
-        rangeAllocator->SetAttribute("range", DoubleValue(range));
-        mobilityEd.SetPositionAllocator(rangeAllocator);
+        //// End Device mobility
+        //mobilityEd.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+        //// We define rho to generalize the allocation disk for any number of gateway rings
+        //double rho = range + 2.0 * gatewayDistance * (gatewayRings - 1);
+        //rangeAllocator = CreateObject<RangePositionAllocator>();
+        //rangeAllocator->SetAttribute("rho", DoubleValue(rho));
+        //rangeAllocator->SetAttribute("ZRV",
+        //                             StringValue("ns3::UniformRandomVariable[Min=1|Max=10]"));
+        //rangeAllocator->SetAttribute("range", DoubleValue(range));
+        //mobilityEd.SetPositionAllocator(rangeAllocator);
     }
 
     /******************
