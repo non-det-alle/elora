@@ -77,3 +77,11 @@ build_lib_example(
     ${libcore}
     ${liblorawan}
 )
+
+build_lib_example(
+  NAME bike-mobility-example
+  SOURCE_FILES bike-mobility-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
+)
