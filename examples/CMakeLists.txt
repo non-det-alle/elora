@@ -79,6 +79,14 @@ build_lib_example(
 )
 
 build_lib_example(
+  NAME bike-mobility-example
+  SOURCE_FILES bike-mobility-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
+)
+
+build_lib_example(
   NAME Waypoint_Mobility_test_Example
   SOURCE_FILES Mobility_Examples/Waypoint_Mobility_test_Example.cc
   LIBRARIES_TO_LINK
