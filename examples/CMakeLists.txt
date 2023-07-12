@@ -79,56 +79,8 @@ build_lib_example(
 )
 
 build_lib_example(
-  NAME Waypoint_Mobility_test_Example
-  SOURCE_FILES Mobility_Examples/Waypoint_Mobility_test_Example.cc
-  LIBRARIES_TO_LINK
-    ${libcore}
-    ${liblorawan}
-)
-
-build_lib_example(
-  NAME VM_Example
-  SOURCE_FILES Mobility_Examples/VM_Example.cc
-  LIBRARIES_TO_LINK
-    ${libcore}
-    ${liblorawan}
-)
-
-build_lib_example(
-  NAME VM_with_Application_Class
-  SOURCE_FILES Mobility_Examples/VM_with_Application_Class.cc
-  LIBRARIES_TO_LINK
-    ${libcore}
-    ${liblorawan}
-)
-
-build_lib_example(
-  NAME VM_without_Application_Class
-  SOURCE_FILES Mobility_Examples/VM_without_Application_Class.cc
-  LIBRARIES_TO_LINK
-    ${libcore}
-    ${liblorawan}
-)
-
-build_lib_example(
-  NAME WM_Adding_waypoints_from_Data_Set_Example
-  SOURCE_FILES Mobility_Examples/WM_Adding_waypoints_from_Data_Set_Example.cc
-  LIBRARIES_TO_LINK
-    ${libcore}
-    ${liblorawan}
-)
-
-build_lib_example(
-  NAME WM_with_unix_time_example
-  SOURCE_FILES Mobility_Examples/WM_with_unix_time_example.cc
-  LIBRARIES_TO_LINK
-    ${libcore}
-    ${liblorawan}
-)
-
-build_lib_example(
-  NAME test_ex
-  SOURCE_FILES Mobility_Examples/test_ex.cc
+  NAME bike-mobility-example
+  SOURCE_FILES bike-mobility-example.cc
   LIBRARIES_TO_LINK
     ${libcore}
     ${liblorawan}
