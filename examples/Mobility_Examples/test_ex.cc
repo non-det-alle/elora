@@ -9,6 +9,7 @@
 // #include "ns3/bike-mobility-helper.h"
 
 #include "ns3/bike-mobility-helper.h"
+#include "ns3/mobility-helper.h"
 
 
 NS_LOG_COMPONENT_DEFINE("WaypointMobility");
@@ -16,17 +17,28 @@ NS_LOG_COMPONENT_DEFINE("WaypointMobility");
 using namespace ns3;
 
 
-
 int main (int argc, char *argv[]) {
-    LogComponentEnable("WaypointMobility", LOG_LEVEL_INFO);
+  
+    LogComponentEnable("WaypointMobility", LOG_LEVEL_DEBUG);
     LogComponentEnable("BikeHelper", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("BikeHelper", LOG_LEVEL_INFO);
 
     std::string filename = "/etudiants/siscol/k/kayan_mo/elora/ns-3-dev/contrib/lorawan/examples/Mobility_Examples/Data_Set/DataSet.csv";
 
     BikeHelper bikehelper;
 
     bikehelper.SetFileName(filename);
-    NodeContainer nodes = bikehelper.create_nodes_helper();
+  
+    NodeContainer nodes = bikehelper.Create_And_Install_Helper();
+
+    
+
+
+    // auto save = SaveWaypoints(bikehelper.dataset, bikehelper.myMap ,bikehelper.nodes);
+
+    // MobilityHelper mobilityEd;
+    // mobilityEd.SetMobilityModel("ns3::WaypointMobilityModel");
+    // std :: cout << "Mobility Model Selected is = " << mobilityEd.GetMobilityModelType() << std :: endl;
 
 
     // /************************************************
