@@ -1,6 +1,6 @@
 
 #include "bike-mobility-helper.h"
-
+#include "ns3/mobility-module.h"
 
 
 namespace ns3
@@ -17,7 +17,7 @@ BikeHelper::~BikeHelper(){
 }
 
 ns3::NodeContainer
-BikeHelper::create_nodes_helper(){
+BikeHelper::Create_And_Install_Helper(){
     NS_LOG_DEBUG("Hi From Bike Mobility Helper" << this->filename);
 
     // Calling Reading from data set function
@@ -28,7 +28,24 @@ BikeHelper::create_nodes_helper(){
     NS_LOG_DEBUG("Size of Map is : " << Get_Num_of_Nodes());
 
     this->nodes.Create(Get_Num_of_Nodes());
-    NS_LOG_DEBUG("Nodes Created");
+    NS_LOG_DEBUG("Nodes Created ...");
+
+    SetMobilityModel("ns3::WaypointMobilityModel");
+
+    Install(this->nodes);
+    NS_LOG_DEBUG("Mobility Model Selected is = " << GetMobilityModelType());
+
+
+    this->waypointMobility = SaveWaypoints(this->dataset, this->myMap, this->nodes);
+    NS_LOG_DEBUG("WayPoints Added ...");
+
+
+    this->node_StartTime = start_time_of_node(this->dataset, this->myMap);
+    NS_LOG_DEBUG("Node Start Time is Extracted ...");
+
+    this->node_EndTime = end_time_of_node(this->dataset, this->myMap);
+    NS_LOG_DEBUG("Node End Time is Extracted ...");
+
     return this->nodes;
 }
 
@@ -41,7 +58,6 @@ int
 BikeHelper::Get_Num_of_Nodes(){
     return this->myMap.size();
 }
-
 
 // function to read data and store it in vector
 std::vector<BikeData>
@@ -123,96 +139,110 @@ BikeHelper::createBikeNumberMap(const std::vector<BikeData>& dataset) {
 // function to return the waypoint mobility object
 ns3::Ptr<ns3::WaypointMobilityModel> 
 BikeHelper::SaveWaypoints(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap, ns3::NodeContainer nodes){
-    Ptr<ns3::WaypointMobilityModel> waypointMobility;
     int row = 0; 
     for (const BikeData& bike : dataset) {
         for (const auto& pair : myMap) {
             if (pair.first == bike.bikeNumber) {
-                // std :: cout << "row = " << row++ << std :: endl;
                 if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
-                    std :: cout << "row = " << row << " is Skipped" << std :: endl;
+                    NS_LOG_INFO("row = " << row << " is Skipped"); 
                     row++;
                 }
                 else{
-                    //node = nodes.Get(pair.second);
-                    waypointMobility = nodes.Get(pair.second)->GetObject<ns3::WaypointMobilityModel>();
-                    // Waypoint 1 - Start Position
-                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_started), Vector(bike.start_lng, bike.start_lat, 0.0)));
-                    //std :: cout << "Start WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl; 
-                    // Waypoint 2 - End Position                
-                    waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_ended), Vector(bike.end_lng, bike.end_lat, 0.0)));
-                    //std :: cout << "End WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl;
+                    node = nodes.Get(pair.second);
+                    this->waypointMobility = this->node->GetObject<WaypointMobilityModel>();
+                    // // Waypoint 1 - Start Position
+                    this->waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_started), Vector(bike.start_lng, bike.start_lat, 0.0)));
+                    NS_LOG_INFO("Start WayPoint for Node : " << this->node->GetId() << ", Is Saved for row = " << row); 
+                    // // Waypoint 2 - End Position                
+                    this->waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_ended), Vector(bike.end_lng, bike.end_lat, 0.0)));
+                    NS_LOG_INFO("End WayPoint for Node : " << this->node->GetId() << ", Is Saved for row = " << row);
                     row++;
-                    //std :: cout << "*****************************************************************" << std :: endl;
                 }
             }
         }
     }
 
-    return waypointMobility;
+    return this->waypointMobility;
 }
+
+// Helper function to map start time of node
+std::map<long, int> 
+BikeHelper::start_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap) {
+    int row = 0; 
+    for (const BikeData& bike : dataset) {
+        for (const auto& pair : myMap) {
+            if (pair.first == bike.bikeNumber) {
+                if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
+                    NS_LOG_INFO("row = " << row << " is Skipped"); 
+                    row++;
+                }
+                else{
+                    if(!this->node_StartTime.empty()){
+                        // Checking if the key exists using the find() function
+                        auto it = this->node_StartTime.find(pair.second);
+                        if (it != this->node_StartTime.end()) {
+                            NS_LOG_INFO("Key " << pair.second << " exists in the map[node_StartTime]"); 
+                        } 
+                        else {
+                            NS_LOG_INFO("Key " << pair.second << " is added to map[node_StartTime]"); 
+                            this->node_StartTime.insert(std::make_pair(pair.second, bike.time_started));
+                        }
+                    }
+                    else{
+                        this->node_StartTime.insert(std::make_pair(pair.second, bike.time_started));
+                        //std::cout << "First Key " << pair.second << " is added to map[node_StartTime]" << std::endl;
+                    }
+                    row++;
+                }
+            }
+        }
+    }
+
+    return this->node_StartTime;
+}
+
+// Helper function to map end time of node
+std::map<long, int> 
+BikeHelper::end_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap) {
+    int row = 0; 
+    for (const BikeData& bike : dataset) {
+        for (const auto& pair : myMap) {
+            if (pair.first == bike.bikeNumber) {
+                if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
+                    NS_LOG_INFO("row = " << row << " is Skipped"); 
+                    row++;
+                }
+                else{
+                    if(!this->node_EndTime.empty()){
+                        // Checking if the key exists using the find() function
+                        auto it = this->node_EndTime.find(pair.second);
+                        if (it != this->node_EndTime.end()) {
+                            if (this->node_EndTime[pair.second] <= bike.time_ended){
+                                NS_LOG_INFO("Key " << pair.second << " is updated in the map[node_EndTime], From = " << this->node_EndTime[pair.second] << " to " << bike.time_ended);
+                                this->node_EndTime[pair.second] = bike.time_ended; 
+                            }
+                        } 
+                        else {
+                            NS_LOG_INFO("Key " << pair.second << " is added to map[node_EndTime]");
+                            this->node_EndTime.insert(std::make_pair(pair.second, bike.time_ended));
+                        }
+                    }
+                    else{
+                        this->node_EndTime.insert(std::make_pair(pair.second, bike.time_ended));
+                    }
+                    row++;
+                }
+            }
+        }
+    }
+
+    return this->node_EndTime;
+}
+
 
 } // namespace ns3
 
 
-
-
-// // function to read data and store it in vector
-// std::vector<BikeData> 
-// readDataset(const std::string& filename) {
-//     std::vector<BikeData> dataset;
-//     std::ifstream file(filename);
-
-//     if (file) {
-//         std::string line;
-//         std::getline(file, line); // Skip header line
-
-//         while (std::getline(file, line)) {
-//             std::stringstream ss(line);
-//             std::string value;
-//             BikeData bikeData;
-
-//             std::getline(ss, value, ',');
-//             bikeData.bikeNumber = value;
-
-//             std::getline(ss, value, ',');
-//             bikeData.duration = std::stoi(value);
-
-//             std::getline(ss, value, ',');
-//             bikeData.time_started = std::stol(value);
-
-//             std::getline(ss, value, ',');
-//             bikeData.time_ended = std::stol(value);
-
-//             std::getline(ss, value, ',');
-//             bikeData.start_station = std::stoi(value);
-
-//             std::getline(ss, value, ',');
-//             bikeData.end_station = std::stoi(value);
-
-//             std::getline(ss, value, ',');
-//             bikeData.start_lat = std::stod(value);
-
-//             std::getline(ss, value, ',');
-//             bikeData.start_lng = std::stod(value);
-
-//             std::getline(ss, value, ',');
-//             bikeData.end_lat = std::stod(value);
-
-//             std::getline(ss, value);
-//             bikeData.end_lng = std::stod(value);
-
-//             dataset.push_back(bikeData);
-//         }
-
-//         file.close();
-//     }
-//     else {
-//         std::cerr << "Failed to open the file: " << filename << std::endl;
-//     }
-
-//     return dataset;
-// }
 
 // // function to print position
 // void 
@@ -236,146 +266,4 @@ BikeHelper::SaveWaypoints(const std::vector<BikeData>& dataset, const std::map<s
 //         }
 //     }
 // }
-
-// // function to store unique bike id and give them key
-// std::map<std::string, int> 
-// createBikeNumberMap(const std::vector<BikeData>& dataset) {
-//     std::map<std::string, int> myMap;
-//     std::set<std::string> uniqueBikeNumbers;
-
-//     // Collect unique bike numbers
-//     for (const BikeData& data : dataset) {
-//         uniqueBikeNumbers.insert(data.bikeNumber);
-//     }
-
-//     // Assign keys to unique bike numbers and store in the map
-//     int key = 0;
-//     for (const std::string& bikeNumber : uniqueBikeNumbers) {
-//         myMap[bikeNumber] = key++;
-//     }
-
-//     return myMap;
-// }
-
-// // function to return the waypoint mobility object
-// ns3::Ptr<ns3::WaypointMobilityModel> 
-// SaveWaypoints(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap, ns3::NodeContainer nodes){
-//     Ptr<ns3::WaypointMobilityModel> waypointMobility;
-
-//     int row = 0; 
-//     for (const BikeData& bike : dataset) {
-//         for (const auto& pair : myMap) {
-//             if (pair.first == bike.bikeNumber) {
-//                 // std :: cout << "row = " << row++ << std :: endl;
-//                 if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
-//                     std :: cout << "row = " << row << " is Skipped" << std :: endl;
-//                     row++;
-//                 }
-//                 else{
-//                     //node = nodes.Get(pair.second);
-//                     waypointMobility = nodes.Get(pair.second)->GetObject<ns3::WaypointMobilityModel>();
-//                     // Waypoint 1 - Start Position
-//                     waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_started), Vector(bike.start_lng, bike.start_lat, 0.0)));
-//                     //std :: cout << "Start WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl; 
-//                     // Waypoint 2 - End Position                
-//                     waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_ended), Vector(bike.end_lng, bike.end_lat, 0.0)));
-//                     //std :: cout << "End WayPoint for Node : " << node->GetId() << ", Is Saved for row = " << row << std :: endl;
-//                     row++;
-//                     //std :: cout << "*****************************************************************" << std :: endl;
-//                 }
-//             }
-//         }
-//     }
-
-//     return waypointMobility;
-// }
-
-// // Helper function to map start time of node
-// std::map<long, int> 
-// start_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap) {
-//     std::map<long, int> node_Map_StartTime;
-//     int row = 0; 
-//     for (const BikeData& bike : dataset) {
-//         for (const auto& pair : myMap) {
-//             if (pair.first == bike.bikeNumber) {
-//                 // std :: cout << "row = " << row++ << std :: endl;
-//                 if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
-//                     //std :: cout << "row = " << row << " is Skipped" << std :: endl;
-//                     row++;
-//                 }
-//                 else{                   
-//                     row++;                    
-//                     /***********************************************
-//                     *      Saving Start time in map section        *
-//                     ************************************************/
-//                     if(!node_Map_StartTime.empty()){
-//                         // Checking if the key exists using the find() function
-//                         auto it = node_Map_StartTime.find(pair.second);
-//                         if (it != node_Map_StartTime.end()) {
-//                             //std::cout << "Key " << pair.second << " exists in the mapmap[node_Map_StartTime]" << std::endl;
-//                         } 
-//                         else {
-//                             //std::cout << "Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
-//                             node_Map_StartTime.insert(std::make_pair(pair.second, bike.time_started));
-//                         }
-//                     }
-//                     else{
-//                         node_Map_StartTime.insert(std::make_pair(pair.second, bike.time_started));
-//                         //std::cout << "First Key " << pair.second << " is added to map[node_Map_StartTime]" << std::endl;
-//                     }
-//                     //std :: cout << "*****************************************************************" << std :: endl;
-//                 }
-//             }
-//         }
-//     }
-
-//     return node_Map_StartTime;
-// }
-
-// // Helper function to map end time of node
-// std::map<long, int> 
-// end_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap) {
-//     std::map<long, int> node_Map_EndTime;
-//     int row = 0; 
-//     for (const BikeData& bike : dataset) {
-//         for (const auto& pair : myMap) {
-//             if (pair.first == bike.bikeNumber) {
-//                 // std :: cout << "row = " << row++ << std :: endl;
-//                 if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
-//                     //std :: cout << "row = " << row << " is Skipped" << std :: endl;
-//                     row++;
-//                 }
-//                 else{                   
-//                     row++;                    
-//                     /***********************************************
-//                     *      Saving End time in map section          *
-//                     ************************************************/
-//                     if(!node_Map_EndTime.empty()){
-//                         // Checking if the key exists using the find() function
-//                         auto it = node_Map_EndTime.find(pair.second);
-//                         if (it != node_Map_EndTime.end()) {
-//                             if (node_Map_EndTime[pair.second] <= bike.time_ended){
-//                                 //std::cout << "Key " << pair.second << " is updated in the mapmap[node_Map_EndTime], From = " << node_Map_EndTime[pair.second] << " to " << bike.time_ended << std::endl;
-//                                 node_Map_EndTime[pair.second] = bike.time_ended; 
-//                             }
-//                             //std::cout << "Key " << pair.second << " exists in the mapmap[node_Map_EndTime]" << std::endl;
-//                         } 
-//                         else {
-//                             //std::cout << "Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
-//                             node_Map_EndTime.insert(std::make_pair(pair.second, bike.time_ended));
-//                         }
-//                     }
-//                     else{
-//                         node_Map_EndTime.insert(std::make_pair(pair.second, bike.time_ended));
-//                         //std::cout << "First Key " << pair.second << " is added to map[node_Map_EndTime]" << std::endl;
-//                     }
-//                     //std :: cout << "*****************************************************************" << std :: endl;
-//                 }
-//             }
-//         }
-//     }
-//     return node_Map_EndTime;
-// }
-
-
 
