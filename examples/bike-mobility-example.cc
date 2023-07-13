@@ -161,7 +161,7 @@ main(int argc, char* argv[])
         rangeAllocator->SetNodes(gateways);
 
         endDevices.Create(nDevices);
-        mobilityEd.Install(endDevices);
+        mobilityEd.Install(endDevices); // here i can pass my nodes
     }
 
     /************************
