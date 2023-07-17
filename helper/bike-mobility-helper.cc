@@ -16,38 +16,51 @@ BikeHelper::~BikeHelper(){
     NS_LOG_FUNCTION(this);
 }
 
-ns3::NodeContainer
-BikeHelper::Create_And_Install_Helper(){
-    NS_LOG_DEBUG("Hi From Bike Mobility Helper" << this->filename);
+void
+BikeHelper::Install(NodeContainer nodes) 
+{
+    MobilityHelper mobility;
+    mobility.SetMobilityModel("ns3::WaypointMobilityModel");
+    mobility.Install(nodes);
 
-    // Calling Reading from data set function
-    this->dataset = readDataset(this->filename);
-    NS_LOG_DEBUG("File Read Successfully");
-
-    this->myMap = createBikeNumberMap(this->dataset);
-    NS_LOG_DEBUG("Size of Map is : " << Get_Num_of_Nodes());
-
-    this->nodes.Create(Get_Num_of_Nodes());
-    NS_LOG_DEBUG("Nodes Created ...");
-
-    SetMobilityModel("ns3::WaypointMobilityModel");
-
-    Install(this->nodes);
-    NS_LOG_DEBUG("Mobility Model Selected is = " << GetMobilityModelType());
-
-
-    this->waypointMobility = SaveWaypoints(this->dataset, this->myMap, this->nodes);
+    SaveWaypointsImpl(this->dataset, this->myMap, nodes);
     NS_LOG_DEBUG("WayPoints Added ...");
-
 
     this->node_StartTime = start_time_of_node(this->dataset, this->myMap);
     NS_LOG_DEBUG("Node Start Time is Extracted ...");
 
     this->node_EndTime = end_time_of_node(this->dataset, this->myMap);
     NS_LOG_DEBUG("Node End Time is Extracted ...");
-
-    return this->nodes;
 }
+
+void BikeHelper::SaveWaypointsImpl(const std::vector<BikeData>& dataset, const std::map<std::string, int>& myMap, ns3::NodeContainer nodes)
+{
+    NS_LOG_DEBUG("HI ...");
+    int row = 0; 
+    for (const BikeData& bike : dataset) {
+        for (const auto& pair : myMap) {
+            if (pair.first == bike.bikeNumber) {
+                if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
+                    NS_LOG_INFO("row = " << row << " is Skipped"); 
+                    row++;
+                }
+                else{
+                    this->node = nodes.Get(pair.second);
+                    this->waypointMobility = this->node->GetObject<WaypointMobilityModel>();
+                    // // Waypoint 1 - Start Position
+                    this->waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_started), Vector(bike.start_lng, bike.start_lat, 0.0)));
+                    NS_LOG_INFO("Start WayPoint for Node : " << this->node->GetId() << ", Is Saved for row = " << row); 
+                    // // Waypoint 2 - End Position                
+                    this->waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_ended), Vector(bike.end_lng, bike.end_lat, 0.0)));
+                    NS_LOG_INFO("End WayPoint for Node : " << this->node->GetId() << ", Is Saved for row = " << row);
+                    row++;
+                }
+            }
+        }
+    }
+}
+
+
 
 void
 BikeHelper::SetFileName(const std::string& filename){
@@ -56,6 +69,17 @@ BikeHelper::SetFileName(const std::string& filename){
 
 int 
 BikeHelper::Get_Num_of_Nodes(){
+    NS_LOG_DEBUG("Hi From Bike Mobility Helper" << this->filename);
+
+    // Calling Reading from data set function
+    this->dataset = readDataset(this->filename);
+    NS_LOG_DEBUG("File Read Successfully");
+
+    this->myMap = createBikeNumberMap(this->dataset);
+
+    NS_LOG_DEBUG("Size of Map is : " << myMap.size());
+
+
     return this->myMap.size();
 }
 
@@ -134,35 +158,6 @@ BikeHelper::createBikeNumberMap(const std::vector<BikeData>& dataset) {
     }
 
     return myMap;
-}
-
-// function to return the waypoint mobility object
-ns3::Ptr<ns3::WaypointMobilityModel> 
-BikeHelper::SaveWaypoints(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap, ns3::NodeContainer nodes){
-    int row = 0; 
-    for (const BikeData& bike : dataset) {
-        for (const auto& pair : myMap) {
-            if (pair.first == bike.bikeNumber) {
-                if (row == 88563 || row == 149263 || row == 149472 || row ==152101){ // faulty rows
-                    NS_LOG_INFO("row = " << row << " is Skipped"); 
-                    row++;
-                }
-                else{
-                    node = nodes.Get(pair.second);
-                    this->waypointMobility = this->node->GetObject<WaypointMobilityModel>();
-                    // // Waypoint 1 - Start Position
-                    this->waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_started), Vector(bike.start_lng, bike.start_lat, 0.0)));
-                    NS_LOG_INFO("Start WayPoint for Node : " << this->node->GetId() << ", Is Saved for row = " << row); 
-                    // // Waypoint 2 - End Position                
-                    this->waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_ended), Vector(bike.end_lng, bike.end_lat, 0.0)));
-                    NS_LOG_INFO("End WayPoint for Node : " << this->node->GetId() << ", Is Saved for row = " << row);
-                    row++;
-                }
-            }
-        }
-    }
-
-    return this->waypointMobility;
 }
 
 // Helper function to map start time of node
