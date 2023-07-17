@@ -24,6 +24,10 @@
 #include "ns3/range-position-allocator.h"
 #include "ns3/urban-traffic-helper.h"
 
+#include "ns3/bike-mobility-helper.h"
+#include "ns3/bike-application.h"
+
+
 using namespace ns3;
 using namespace lorawan;
 
@@ -88,6 +92,8 @@ main(int argc, char* argv[])
         LogComponentEnableAll(LOG_PREFIX_FUNC);
         LogComponentEnableAll(LOG_PREFIX_NODE);
         LogComponentEnableAll(LOG_PREFIX_TIME);
+        LogComponentEnable("BikeHelper", LOG_LEVEL_DEBUG);
+
     }
 
     /******************
@@ -122,6 +128,12 @@ main(int argc, char* argv[])
      **************/
 
     MobilityHelper mobilityEd, mobilityGw;
+
+    BikeHelper bikehelper;
+    std::string filename = "/etudiants/siscol/k/kayan_mo/elora/ns-3-dev/contrib/lorawan/examples/Mobility_Examples/Data_Set/DataSet.csv";
+    bikehelper.SetFileName(filename);
+    int num_end_devices = bikehelper.Get_Num_of_Nodes();
+
     Ptr<RangePositionAllocator> rangeAllocator;
     {
         // Gateway mobility
@@ -134,15 +146,15 @@ main(int argc, char* argv[])
         mobilityGw.SetPositionAllocator(hexAllocator);
 
         //// End Device mobility
-        //mobilityEd.SetMobilityModel("ns3::ConstantPositionMobilityModel");
-        //// We define rho to generalize the allocation disk for any number of gateway rings
-        //double rho = range + 2.0 * gatewayDistance * (gatewayRings - 1);
-        //rangeAllocator = CreateObject<RangePositionAllocator>();
-        //rangeAllocator->SetAttribute("rho", DoubleValue(rho));
-        //rangeAllocator->SetAttribute("ZRV",
-        //                             StringValue("ns3::UniformRandomVariable[Min=1|Max=10]"));
-        //rangeAllocator->SetAttribute("range", DoubleValue(range));
-        //mobilityEd.SetPositionAllocator(rangeAllocator);
+        mobilityEd.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+        // We define rho to generalize the allocation disk for any number of gateway rings
+        double rho = range + 2.0 * gatewayDistance * (gatewayRings - 1);
+        rangeAllocator = CreateObject<RangePositionAllocator>();
+        rangeAllocator->SetAttribute("rho", DoubleValue(rho));
+        rangeAllocator->SetAttribute("ZRV",
+                                    StringValue("ns3::UniformRandomVariable[Min=1|Max=10]"));
+        rangeAllocator->SetAttribute("range", DoubleValue(range));
+        mobilityEd.SetPositionAllocator(rangeAllocator);
     }
 
     /******************
@@ -159,9 +171,8 @@ main(int argc, char* argv[])
         gateways.Create(nGateways);
         mobilityGw.Install(gateways);
         rangeAllocator->SetNodes(gateways);
-
-        endDevices.Create(nDevices);
-        mobilityEd.Install(endDevices); // here i can pass my nodes
+        endDevices.Create(num_end_devices);
+        bikehelper.Install(endDevices); // Defining the mobility model and waypoints in this function
     }
 
     /************************
@@ -226,23 +237,40 @@ main(int argc, char* argv[])
         ForwarderHelper forwarderHelper;
         forwarderHelper.Install(gateways);
 
-        // Install applications in EDs
-        PeriodicSenderHelper appHelper;
-        appHelper.SetPeriodGenerator(
-            CreateObjectWithAttributes<NormalRandomVariable>("Mean",
-                                                             DoubleValue(600.0),
-                                                             "Variance",
-                                                             DoubleValue(300.0),
-                                                             "Bound",
-                                                             DoubleValue(600.0)));
-        appHelper.SetPacketSizeGenerator(
-            CreateObjectWithAttributes<NormalRandomVariable>("Mean",
-                                                             DoubleValue(18),
-                                                             "Variance",
-                                                             DoubleValue(10),
-                                                             "Bound",
-                                                             DoubleValue(18)));
-        ApplicationContainer apps = appHelper.Install(endDevices);
+        Ptr<ns3::lorawan::BikeApplication> app = CreateObject<ns3::lorawan::BikeApplication>();
+        Ptr<Node> node;
+        long node_start_time, node_end_time;
+        for (const auto& pair : bikehelper.myMap) {
+            //std::cout<<"Number = " << i << std :: endl;
+            // Create an instance of your application
+            node = endDevices.Get(pair.second);
+            node->AddApplication(app);
+            app->SetNode(node);
+            // Configure and schedule events for your application
+            node_start_time = bikehelper.node_StartTime[pair.second];
+            node_end_time = bikehelper.node_EndTime[pair.second];
+
+            app->SetStartTime(Seconds(node_start_time)); //startTime
+            app->SetStopTime(Seconds(node_end_time)); //endTime
+        }
+
+        // // Install applications in EDs
+        // PeriodicSenderHelper appHelper;
+        // appHelper.SetPeriodGenerator(
+        //     CreateObjectWithAttributes<NormalRandomVariable>("Mean",
+        //                                                      DoubleValue(600.0),
+        //                                                      "Variance",
+        //                                                      DoubleValue(300.0),
+        //                                                      "Bound",
+        //                                                      DoubleValue(600.0)));
+        // appHelper.SetPacketSizeGenerator(
+        //     CreateObjectWithAttributes<NormalRandomVariable>("Mean",
+        //                                                      DoubleValue(18),
+        //                                                      "Variance",
+        //                                                      DoubleValue(10),
+        //                                                      "Bound",
+        //                                                      DoubleValue(18)));
+        // ApplicationContainer apps = appHelper.Install(endDevices);
     }
 
     /***************************
