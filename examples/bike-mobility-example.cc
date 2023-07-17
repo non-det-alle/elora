@@ -42,7 +42,7 @@ main(int argc, char* argv[])
      ***************************/
 
     int periods = 24; // Hours
-    int gatewayRings = 1;
+    int gatewayRings = 2;
     double range = 2426.85; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
     int nDevices = 100;
     std::string sir = "CROCE";
@@ -93,6 +93,7 @@ main(int argc, char* argv[])
         LogComponentEnableAll(LOG_PREFIX_NODE);
         LogComponentEnableAll(LOG_PREFIX_TIME);
         LogComponentEnable("BikeHelper", LOG_LEVEL_DEBUG);
+        LogComponentEnable("BikeApplication", LOG_LEVEL_DEBUG);
 
     }
 
@@ -236,25 +237,31 @@ main(int argc, char* argv[])
         // Install the Forwarder application on the gateways
         ForwarderHelper forwarderHelper;
         forwarderHelper.Install(gateways);
-
-        Ptr<ns3::lorawan::BikeApplication> app = CreateObject<ns3::lorawan::BikeApplication>();
+        
+        
         Ptr<Node> node;
+        Ptr<BikeApplication> app; 
         long node_start_time, node_end_time;
         for (const auto& pair : bikehelper.myMap) {
-            //std::cout<<"Number = " << i << std :: endl;
+            app = CreateObject<BikeApplication>();
             // Create an instance of your application
             node = endDevices.Get(pair.second);
+            // std:: cout << "Node : " << node->GetId() << std::endl; 
             node->AddApplication(app);
             app->SetNode(node);
             // Configure and schedule events for your application
-            node_start_time = bikehelper.node_StartTime[pair.second];
+            node_start_time = bikehelper.node_StartTime[pair.second];            
+            // std:: cout << "Start Time : " << node_start_time << std::endl; 
+
             node_end_time = bikehelper.node_EndTime[pair.second];
+            // std:: cout << "End Time : " << node_end_time << std::endl; 
+
 
             app->SetStartTime(Seconds(node_start_time)); //startTime
             app->SetStopTime(Seconds(node_end_time)); //endTime
         }
 
-        // // Install applications in EDs
+        // Install applications in EDs
         // PeriodicSenderHelper appHelper;
         // appHelper.SetPeriodGenerator(
         //     CreateObjectWithAttributes<NormalRandomVariable>("Mean",
