@@ -9,6 +9,7 @@
 // #include "ns3/bike-mobility-helper.h"
 
 #include "ns3/bike-mobility-helper.h"
+// #include "ns3/bike-application.h"
 #include "ns3/mobility-helper.h"
 
 
@@ -18,20 +19,62 @@ using namespace ns3;
 
 
 int main (int argc, char *argv[]) {
-  
+
     LogComponentEnable("WaypointMobility", LOG_LEVEL_DEBUG);
     LogComponentEnable("BikeHelper", LOG_LEVEL_DEBUG);
-    // LogComponentEnable("BikeHelper", LOG_LEVEL_INFO);
+
+    // MobilityHelper bikehelper;
+    // bikehelper.SetMobilityModel("ns3::WaypointMobilityModel");
+    // NS_LOG_DEBUG("Mobility Model Selected is = " << bikehelper.GetMobilityModelType());
 
     std::string filename = "/etudiants/siscol/k/kayan_mo/elora/ns-3-dev/contrib/lorawan/examples/Mobility_Examples/Data_Set/DataSet.csv";
 
     BikeHelper bikehelper;
 
     bikehelper.SetFileName(filename);
-  
-    NodeContainer nodes = bikehelper.Create_And_Install_Helper();
+
+    int num_end_devices = bikehelper.Get_Num_of_Nodes();
+
+
+
+    NodeContainer nodes;
+    nodes.Create(num_end_devices);
+    bikehelper.Install(nodes);    
+
 
     
+    // LogComponentEnable("BikeHelper", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("BikeApplication", LOG_LEVEL_DEBUG);
+
+    // // LogComponentEnable("BikeHelper", LOG_LEVEL_INFO);
+
+    // std::string filename = "/etudiants/siscol/k/kayan_mo/elora/ns-3-dev/contrib/lorawan/examples/Mobility_Examples/Data_Set/DataSet.csv";
+
+    // BikeHelper bikehelper;
+
+    // bikehelper.SetFileName(filename);
+  
+    // NodeContainer nodes = bikehelper.Create_And_Install_Helper();
+
+    // Ptr<Node> node;
+    // //Create an instance of your application
+    // Ptr<ns3::lorawan::BikeApplication> app = CreateObject<ns3::lorawan::BikeApplication>();
+    // // NS_LOG_DEBUG("Node = " << node->GetId());
+
+
+    // for (const auto& pair : bikehelper.myMap) {
+    //     //std::cout<<"Number = " << i << std :: endl;
+    //     // Create an instance of your application
+    //     node = nodes.Get(pair.second);
+    //     node->AddApplication(app);
+    //     app->SetNode(node);
+    //     // Configure and schedule events for your application
+    //     app->SetStartTime(Seconds(bikehelper.node_StartTime[pair.second])); //startTime
+    //     app->SetStopTime(Seconds(bikehelper.node_EndTime[pair.second])); //endTime
+    // }
+    // // Run the simulation
+    // Simulator::Run();
+    // Simulator::Destroy();
 
 
     // auto save = SaveWaypoints(bikehelper.dataset, bikehelper.myMap ,bikehelper.nodes);
@@ -121,20 +164,7 @@ int main (int argc, char *argv[]) {
     // // //std :: cout << "Value Stored in myMap of Node 687 is = " << it/*myMap["W01124"]*/ << std :: endl;  // W00581
     // // std :: cout << "*****************************************************************" << std :: endl;
 
-    // /************************************************
-    //  *     Adding waypoints to nodes section        *
-    //  ************************************************/    
-    // // Loop through the nodes
-    // // for (const auto& pair : myMap) {
-    // //     //std::cout<<"Number = " << i << std :: endl;
-    // //     // Create an instance of your application
-    // //     node = nodes.Get(pair.second);
-    // //     node->AddApplication(app);
-    // //     app->SetNode(node);
-    // //     // Configure and schedule events for your application
-    // //     app->SetStartTime(Seconds(node_Map_StartTime[pair.second])); //startTime
-    // //     app->SetStopTime(Seconds(node_Map_EndTime[pair.second])); //endTime
-    // // }
+    
 
  
     // Time startTime = Seconds(0);
@@ -146,9 +176,7 @@ int main (int argc, char *argv[]) {
     // std :: cout << "*****************************************************************" << std :: endl;
 
     // Simulator::Stop(endTime); // Set the overall simulation end time 31.42 days
-    // // Run the simulation
-    // Simulator::Run();
-    // Simulator::Destroy();
+    
 
   return 0;
 }
