@@ -69,7 +69,7 @@ BikeApplication::SendPacket(void)
 
     // Create and send a new packet
     Ptr<Packet> packet = Create<Packet>(m_basePktSize);
-    //m_mac->Send(packet);
+    m_mac->Send(packet);
     // Schedule the next SendPacket event
     m_sendEvent = Simulator::Schedule(m_avgInterval, &BikeApplication::SendPacket, this);
     NS_LOG_DEBUG("Sent a packet of size " << packet->GetSize());
