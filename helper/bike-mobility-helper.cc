@@ -48,10 +48,10 @@ void BikeHelper::SaveWaypointsImpl(const std::vector<BikeData>& dataset, const s
                     this->node = nodes.Get(pair.second);
                     this->waypointMobility = this->node->GetObject<WaypointMobilityModel>();
                     // // Waypoint 1 - Start Position
-                    this->waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_started), Vector(bike.start_lng, bike.start_lat, 0.0)));
+                    this->waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_started), Vector(bike.start_lng, bike.start_lat, 1.0)));
                     NS_LOG_INFO("Start WayPoint for Node : " << this->node->GetId() << ", Is Saved for row = " << row); 
                     // // Waypoint 2 - End Position                
-                    this->waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_ended), Vector(bike.end_lng, bike.end_lat, 0.0)));
+                    this->waypointMobility->AddWaypoint(Waypoint(Seconds(bike.time_ended), Vector(bike.end_lng, bike.end_lat, 1.0)));
                     NS_LOG_INFO("End WayPoint for Node : " << this->node->GetId() << ", Is Saved for row = " << row);
                     row++;
                 }
