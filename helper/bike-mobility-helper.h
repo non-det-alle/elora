@@ -30,39 +30,38 @@ struct BikeData {
     double end_lng;
 };
 
-class BikeHelper : public MobilityHelper{
+class BikeHelper{
     public: 
 
         BikeHelper();
         ~BikeHelper();
 
-        // function to create and install mobility to nodes
-        ns3::NodeContainer Create_And_Install_Helper();
+        std::map<std::string, int> myMap;
+        std::map<long, int> node_StartTime;
+        std::map<long, int> node_EndTime;
 
         // Function to get the total number of nodes
         int Get_Num_of_Nodes();
+        
+        // Install Function and add waypoints function
+        void Install(NodeContainer nodes) ; 
 
         // function to set file name
         void SetFileName(const std::string& filename);
 
-        // void PrintNodePosition(ns3::Ptr<ns3::Node> node);
-
     private:
+
+        MobilityHelper mobility;
         std::string filename;
         std::vector<BikeData> dataset;
-        std::map<std::string, int> myMap;
-        ns3::NodeContainer nodes;
         Ptr<ns3::WaypointMobilityModel> waypointMobility;
         Ptr<ns3::Node> node;
-        std::map<long, int> node_StartTime;
-        std::map<long, int> node_EndTime;
         
         std::map<long, int> end_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap);
         std::map<long, int> start_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap);
         std::vector<BikeData> readDataset(const std::string& filename);
         std::map<std::string, int> createBikeNumberMap(const std::vector<BikeData>& dataset);
-        ns3::Ptr<ns3::WaypointMobilityModel> SaveWaypoints(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap, ns3::NodeContainer nodes);
-
+        void SaveWaypointsImpl(const std::vector<BikeData>& dataset, const std::map<std::string, int>& myMap, ns3::NodeContainer nodes);
 };
 
 
