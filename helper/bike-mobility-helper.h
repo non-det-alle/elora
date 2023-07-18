@@ -18,16 +18,13 @@ namespace ns3
 {
 
 struct BikeData {
-    std::string bikeNumber;
-    int duration;
     long time_started; // now it is sec
     long time_ended; // now it is sec
-    int start_station;
-    int end_station;
-    double start_lat;
-    double start_lng;
-    double end_lat;
-    double end_lng;
+    double start_x;
+    double start_y;
+    double end_x;
+    double end_y;
+    std::string bike_id; 
 };
 
 class BikeHelper{
@@ -57,10 +54,18 @@ class BikeHelper{
         Ptr<ns3::WaypointMobilityModel> waypointMobility;
         Ptr<ns3::Node> node;
         
+        // Helper function to map end time of node
         std::map<long, int> end_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap);
+        
+        // Helper function to map start time of node
         std::map<long, int> start_time_of_node(const std::vector<BikeData>& dataset, const std::map<std::string, int> myMap);
+        
+        // function to read data and store it in vector
         std::vector<BikeData> readDataset(const std::string& filename);
+
+        // function to store unique bike id and give them key
         std::map<std::string, int> createBikeNumberMap(const std::vector<BikeData>& dataset);
+        
         void SaveWaypointsImpl(const std::vector<BikeData>& dataset, const std::map<std::string, int>& myMap, ns3::NodeContainer nodes);
 };
 
