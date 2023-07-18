@@ -9,17 +9,17 @@ set(source_files
     model/app/server/network-controller.cc
     model/app/server/network-controller-components.cc
     model/app/server/adr-component.cc
-    model/app/bike-application.cc #new entry
     model/app/forwarder.cc
     model/app/udp-forwarder.cc
     model/app/lora-application.cc
     model/app/one-shot-sender.cc
     model/app/periodic-sender.cc
     model/app/poisson-sender.cc
+    model/app/bike-application.cc
     model/mac/lorawan-mac.cc
     model/mac/gateway-lorawan-mac.cc
     model/mac/base-end-device-lorawan-mac.cc
-    model/mac/class-a-end-device-lorawan-mac.cc 
+    model/mac/class-a-end-device-lorawan-mac.cc
     model/mac/recv-window-manager.cc
     model/mac/lora-device-address.cc
     model/mac/lora-device-address-generator.cc
@@ -50,11 +50,11 @@ set(source_files
     helper/lora-radio-energy-model-helper.cc
     helper/network-server-helper.cc
     helper/forwarder-helper.cc
-    helper/bike-mobility-helper.cc  #new file
     helper/udp-forwarder-helper.cc
     helper/periodic-sender-helper.cc
     helper/one-shot-sender-helper.cc
     helper/urban-traffic-helper.cc
+    helper/bike-mobility-helper.cc
     helper/chirpstack-helper.cc
     third-party/packet_forwarder/base64.cc
     third-party/packet_forwarder/jitqueue.cc
@@ -76,13 +76,13 @@ set(header_files
     model/app/server/network-controller.h
     model/app/server/network-controller-components.h
     model/app/server/adr-component.h
-    model/app/bike-application.h #new entry
     model/app/forwarder.h
     model/app/udp-forwarder.h
     model/app/lora-application.h
     model/app/one-shot-sender.h
     model/app/periodic-sender.h
     model/app/poisson-sender.h
+    model/app/bike-application.h
     model/mac/lorawan-mac.h
     model/mac/gateway-lorawan-mac.h
     model/mac/base-end-device-lorawan-mac.h
@@ -117,11 +117,11 @@ set(header_files
     helper/lora-radio-energy-model-helper.h
     helper/network-server-helper.h
     helper/forwarder-helper.h
-    helper/bike-mobility-helper.h #new file
     helper/udp-forwarder-helper.h
     helper/periodic-sender-helper.h
     helper/one-shot-sender-helper.h
     helper/urban-traffic-helper.h
+    helper/bike-mobility-helper.h
     helper/chirpstack-helper.h
     third-party/packet_forwarder/base64.h
     third-party/packet_forwarder/jitqueue.h
