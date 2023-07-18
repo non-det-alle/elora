@@ -27,19 +27,16 @@ int main (int argc, char *argv[]) {
     // bikehelper.SetMobilityModel("ns3::WaypointMobilityModel");
     // NS_LOG_DEBUG("Mobility Model Selected is = " << bikehelper.GetMobilityModelType());
 
-    std::string filename = "/etudiants/siscol/k/kayan_mo/elora/ns-3-dev/contrib/lorawan/examples/Mobility_Examples/Data_Set/DataSet.csv";
-
     BikeHelper bikehelper;
-
+    std::string filename = "/etudiants/siscol/k/kayan_mo/elora/ns-3-dev/contrib/lorawan/examples/Mobility_Examples/Data_Set/202003-ns3-biketrips.csv";
     bikehelper.SetFileName(filename);
-
     int num_end_devices = bikehelper.Get_Num_of_Nodes();
 
-
-
-    NodeContainer nodes;
-    nodes.Create(num_end_devices);
-    bikehelper.Install(nodes);    
+    
+    NodeContainer endDevices;
+    endDevices.Create(num_end_devices);
+    bikehelper.Install(endDevices);
+        
 
 
     
