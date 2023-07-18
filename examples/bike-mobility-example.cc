@@ -131,7 +131,7 @@ main(int argc, char* argv[])
     MobilityHelper mobilityEd, mobilityGw;
 
     BikeHelper bikehelper;
-    std::string filename = "/etudiants/siscol/k/kayan_mo/elora/ns-3-dev/contrib/lorawan/examples/Mobility_Examples/Data_Set/DataSet.csv";
+    std::string filename = "/etudiants/siscol/k/kayan_mo/elora/ns-3-dev/contrib/lorawan/examples/Mobility_Examples/Data_Set/202003-ns3-biketrips.csv";
     bikehelper.SetFileName(filename);
     int num_end_devices = bikehelper.Get_Num_of_Nodes();
 
