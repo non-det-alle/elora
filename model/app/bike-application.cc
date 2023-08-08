@@ -59,7 +59,7 @@ BikeApplication::DoInitialize()
     NS_LOG_FUNCTION(this);
     // Ensure that a WaypointMobilityModel has been installed on the node
     m_mobility = m_node->GetObject<WaypointMobilityModel>();
-    NS_ASSERT_MSG(bool(m_mobility) != 0, "No WaypointMobilityNode found on this node");
+    NS_ASSERT_MSG(bool(m_mobility) != 0, "No WaypointMobilityModel found on this node");
     LoraApplication::DoInitialize();
 }
 

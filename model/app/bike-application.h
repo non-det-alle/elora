@@ -31,6 +31,12 @@ namespace ns3
 namespace lorawan
 {
 
+/**
+ * This class provides an application that intends to reproduce the behaviour of a LoRa transmitter
+ * installed on a bicycle of a bike sharing service of a city. This application exposes two
+ * different transmission behaviours (periodical and none) if it is moving or not. It expects a
+ * WaypointMobilityModel installed on the node at simulation start-time.
+ */
 class BikeApplication : public LoraApplication
 {
   public:
