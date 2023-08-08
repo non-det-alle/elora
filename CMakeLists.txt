@@ -55,6 +55,7 @@ set(source_files
     helper/one-shot-sender-helper.cc
     helper/urban-traffic-helper.cc
     helper/bike-sharing-mobility-helper.cc
+    helper/bike-application-helper.cc
     helper/chirpstack-helper.cc
     third-party/packet_forwarder/base64.cc
     third-party/packet_forwarder/jitqueue.cc
@@ -122,6 +123,7 @@ set(header_files
     helper/one-shot-sender-helper.h
     helper/urban-traffic-helper.h
     helper/bike-sharing-mobility-helper.h
+    helper/bike-application-helper.h
     helper/chirpstack-helper.h
     third-party/packet_forwarder/base64.h
     third-party/packet_forwarder/jitqueue.h

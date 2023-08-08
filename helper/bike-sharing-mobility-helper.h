@@ -24,8 +24,8 @@
 #define BIKE_SHARING_MOBILITY_HELPER_H
 
 #include "ns3/node-container.h"
-#include "ns3/vector.h"
 #include "ns3/nstime.h"
+#include "ns3/vector.h"
 
 #include <unordered_map>
 

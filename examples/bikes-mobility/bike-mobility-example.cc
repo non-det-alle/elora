@@ -13,6 +13,7 @@
 #include "ns3/propagation-delay-model.h"
 
 // lorawan imports
+#include "ns3/bike-application-helper.h"
 #include "ns3/bike-application.h"
 #include "ns3/bike-sharing-mobility-helper.h"
 #include "ns3/forwarder-helper.h"
@@ -77,8 +78,8 @@ main(int argc, char* argv[])
     /* Logging options */
     {
         //!> Requirement: build ns3 with debug option
-        //LogComponentEnable("BaseEndDeviceLorawanMac", LOG_LEVEL_DEBUG);
-        //LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
+        // LogComponentEnable("BaseEndDeviceLorawanMac", LOG_LEVEL_DEBUG);
+        // LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
         LogComponentEnable("BikeSharingMobilityHelper", LOG_LEVEL_INFO);
         LogComponentEnable("BikeApplication", LOG_LEVEL_DEBUG);
         LogComponentEnable("WaypointMobilityModel", LOG_LEVEL_DEBUG);
@@ -168,7 +169,9 @@ main(int argc, char* argv[])
         p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
         p2p.SetChannelAttribute("Delay", StringValue("2ms"));
         for (auto gw = gateways.Begin(); gw != gateways.End(); ++gw)
+        {
             p2p.Install(server, *gw);
+        }
 
         /**
          *  LoRa/LoRaWAN layers
@@ -218,17 +221,10 @@ main(int argc, char* argv[])
         forwarderHelper.Install(gateways);
 
         // Install applications in EDs
-        for (auto i = endDevices.Begin(); i != endDevices.End(); ++i)
-        {
-            auto node = *i;
-            // Create an instance of the application
-            auto app = CreateObject<BikeApplication>();
-            app->SetInterval(Minutes(2));
-            app->SetPacketSize(12);
-            
-            app->SetNode(node);
-            node->AddApplication(app);
-        }
+        BikeApplicationHelper bikeAppHelper;
+        bikeAppHelper.SetAttribute("Interval", TimeValue(Minutes(2)));
+        bikeAppHelper.SetAttribute("PacketSize", UintegerValue(12));
+        bikeAppHelper.Install(endDevices);
     }
 
     /***************************
