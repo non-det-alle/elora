@@ -80,7 +80,7 @@ build_lib_example(
 
 build_lib_example(
   NAME bike-mobility-example
-  SOURCE_FILES bike-mobility-example.cc
+  SOURCE_FILES bikes-mobility/bike-mobility-example.cc
   LIBRARIES_TO_LINK
     ${libcore}
     ${liblorawan}
