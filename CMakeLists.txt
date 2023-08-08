@@ -54,7 +54,7 @@ set(source_files
     helper/periodic-sender-helper.cc
     helper/one-shot-sender-helper.cc
     helper/urban-traffic-helper.cc
-    helper/bike-mobility-helper.cc
+    helper/bike-sharing-mobility-helper.cc
     helper/chirpstack-helper.cc
     third_party/packet_forwarder/base64.cc
     third_party/packet_forwarder/jitqueue.cc
@@ -121,7 +121,7 @@ set(header_files
     helper/periodic-sender-helper.h
     helper/one-shot-sender-helper.h
     helper/urban-traffic-helper.h
-    helper/bike-mobility-helper.h
+    helper/bike-sharing-mobility-helper.h
     helper/chirpstack-helper.h
     third_party/packet_forwarder/base64.h
     third_party/packet_forwarder/jitqueue.h
