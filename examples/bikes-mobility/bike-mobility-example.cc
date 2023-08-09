@@ -36,35 +36,46 @@ main(int argc, char* argv[])
      ***************************/
 
     int periods = 24 * 31; // Hours
+    int nDevs = -1;
     int gatewayRings = 2;
     double range = 2426.85; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
     std::string sir = "CROCE";
     bool adrEnabled = false;
 
-    std::string file = "None";
+    std::string out = "None";
     double printPeriod = 0.5;
+    std::string filepath = "";
 
     /* Expose parameters to command line */
     {
         CommandLine cmd(__FILE__);
         cmd.AddValue("periods", "Number of periods to simulate (1 period = 1 hour)", periods);
+        cmd.AddValue("devs", "Number of devices to simulate (-1 defaults to all)", nDevs);
         cmd.AddValue("rings", "Number of gateway rings in hexagonal topology", gatewayRings);
         cmd.AddValue("range", "Radius of the device allocation disk around a gateway)", range);
         cmd.AddValue("sir", "Signal to Interference Ratio matrix used for interference", sir);
         cmd.AddValue("adr", "Whether to enable online ADR", adrEnabled);
-        cmd.AddValue("file",
-                     "Output the metrics of the simulation in a file. "
-                     "Use to set granularity among DEV|SF|GW|NET. "
-                     "Multiple can be passed in the form {DEV,...}",
-                     file);
+        cmd.AddValue("out",
+                     "Output the metrics of the simulation in a file. Use to set granularity among "
+                     "DEV|SF|GW|NET. Multiple can be passed in the form {DEV,...}",
+                     out);
+        cmd.AddValue("printPeriod",
+                     "Periodicity (in hours) of the file printing. In optimized mode, old packets "
+                     "get automatically cleaned up every 1h to reduce memory usage, thus pay "
+                     "attention to the temporality of packet-counting metrics.",
+                     printPeriod);
         cmd.AddValue(
-            "printPeriod",
-            "Periodicity (in hours) of the file printing. In optimized mode, old packets get "
-            "automatically cleaned up every 1h to reduce memory usage, thus pay attention to the "
-            "temporality of packet-counting metrics.",
-            printPeriod);
+            "data",
+            "Complete path to the dataset containing the bike trips. The file should be a csv "
+            "file, with one bike trip per line. It must contain start time, end time, starting X "
+            "position, starting Y position, ending X position, ending Y position, and a bike ID. "
+            "Timestamps are in seconds, X/Y coordinates are in meters, and the ID is any string. "
+            "The delimiter is a comma ',' and the first line will be always skipped (usually has "
+            "column names). It is up to you to provide trips that are sorted by start time and "
+            "that do not overlap in time for the same bike.",
+            filepath);
         cmd.Parse(argc, argv);
-        NS_ASSERT((periods >= 0) and (gatewayRings > 0));
+        NS_ASSERT((periods >= 0) and (nDevs >= -1) and (gatewayRings > 0));
     }
 
     /* Apply global configurations */
@@ -80,9 +91,8 @@ main(int argc, char* argv[])
         //!> Requirement: build ns3 with debug option
         // LogComponentEnable("BaseEndDeviceLorawanMac", LOG_LEVEL_DEBUG);
         // LogComponentEnable("ClassAEndDeviceLorawanMac", LOG_LEVEL_INFO);
-        LogComponentEnable("BikeSharingMobilityHelper", LOG_LEVEL_INFO);
-        LogComponentEnable("BikeApplication", LOG_LEVEL_DEBUG);
-        LogComponentEnable("WaypointMobilityModel", LOG_LEVEL_DEBUG);
+        // LogComponentEnable("BikeSharingMobilityHelper", LOG_LEVEL_DEBUG);
+        // LogComponentEnable("BikeApplication", LOG_LEVEL_DEBUG);
         LogComponentEnableAll(LOG_PREFIX_FUNC);
         LogComponentEnableAll(LOG_PREFIX_NODE);
         LogComponentEnableAll(LOG_PREFIX_TIME);
@@ -131,9 +141,7 @@ main(int argc, char* argv[])
         mobilityGw.SetPositionAllocator(hexAllocator);
 
         // End Device mobility
-        std::string filename = "/home/alle/repos/ns-3-dev/contrib/lorawan/examples/bikes-mobility/"
-                               "202003-ns3-biketrips.csv";
-        mobilityEd.Add(filename);
+        mobilityEd.Add(filepath);
     }
 
     /******************
@@ -143,8 +151,6 @@ main(int argc, char* argv[])
     Ptr<Node> server;
     NodeContainer gateways;
     NodeContainer endDevices;
-    int nDevices = 2;
-    // int nDevices = mobilityEd.GetNBikes();
     {
         server = CreateObject<Node>();
 
@@ -152,7 +158,7 @@ main(int argc, char* argv[])
         gateways.Create(nGateways);
         mobilityGw.Install(gateways);
 
-        endDevices.Create(nDevices);
+        endDevices.Create((nDevs == -1) ? mobilityEd.GetNBikes() : nDevs);
         mobilityEd.Install(endDevices);
     }
 
@@ -232,19 +238,19 @@ main(int argc, char* argv[])
      ***************************/
 
     // Initialize SF emulating the ADR algorithm, then add variance to path loss
-    std::vector<int> devPerSF(1, nDevices);
+    std::vector<int> devPerSF(1, endDevices.GetN());
 
     //! Trace simulation metrics
     Time samplePeriod = Hours(printPeriod);
-    if (file != "None")
+    if (out != "None")
     {
-        loraHelper.EnablePrinting(endDevices, gateways, ParseTraceLevels(file), samplePeriod);
+        loraHelper.EnablePrinting(endDevices, gateways, ParseTraceLevels(out), samplePeriod);
     }
 
     LoraPacketTracker& tracker = loraHelper.GetPacketTracker();
 #ifdef NS3_LOG_ENABLE
     // Print current configuration
-    PrintConfigSetup(nDevices, range, gatewayRings, devPerSF);
+    PrintConfigSetup(endDevices.GetN(), range, gatewayRings, devPerSF);
     loraHelper.EnableSimulationTimePrinting(Hours(24));
 #else
     // Limit memory usage

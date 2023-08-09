@@ -27,7 +27,7 @@
 #include "ns3/nstime.h"
 #include "ns3/vector.h"
 
-#include <unordered_map>
+#include <map>
 
 namespace ns3
 {
@@ -59,7 +59,7 @@ using BikeId_t = std::string;
 class BikeSharingMobilityHelper
 {
     using TripList_t = std::vector<TripData_t>;
-    using BikeDataMap_t = std::unordered_map<BikeId_t, TripList_t>;
+    using BikeDataMap_t = std::map<BikeId_t, TripList_t>;
 
   public:
     BikeSharingMobilityHelper();
