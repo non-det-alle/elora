@@ -1,5 +1,5 @@
 /*
- * This program creates a network with nodes implementing bicycle mobility.
+ * This program creates an elora network with nodes implementing bicycle mobility.
  */
 
 // ns3 imports
@@ -44,7 +44,7 @@ main(int argc, char* argv[])
 
     std::string out = "None";
     double printPeriod = 0.5;
-    std::string filepath = "";
+    std::string filepath = "None";
 
     /* Expose parameters to command line */
     {
@@ -107,19 +107,16 @@ main(int argc, char* argv[])
         // Delay obtained from distance and speed of light in vacuum (constant)
         Ptr<PropagationDelayModel> delay = CreateObject<ConstantSpeedPropagationDelayModel>();
 
-        // This one is empirical and it encompasses average loss due to distance, shadowing (i.e.
-        // obstacles), weather, height
-        auto loss = CreateObject<OkumuraHataPropagationLossModel>();
-        loss->SetAttribute("Frequency", DoubleValue(868100000.0));
-        loss->SetAttribute("Environment", EnumValue(UrbanEnvironment));
-        loss->SetAttribute("CitySize", EnumValue(LargeCity));
-
-        // Here we can add variance to the propagation model with lognormal shadowing
-        auto rayleigh = CreateObject<NakagamiPropagationLossModel>();
-        rayleigh->SetAttribute("m0", DoubleValue(1.0));
-        rayleigh->SetAttribute("m1", DoubleValue(1.0));
-        rayleigh->SetAttribute("m2", DoubleValue(1.0));
-        loss->SetNext(rayleigh);
+        // Path loss take from experimental results in https://doi.org/10.1109/JIOT.2019.2953804
+        auto loss = CreateObject<LogDistancePropagationLossModel>();
+        loss->SetAttribute("Exponent", DoubleValue(2.75));
+        loss->SetAttribute("ReferenceLoss", DoubleValue(74.85));
+        loss->SetAttribute("ReferenceDistance", DoubleValue(1.0));
+        auto shadowing = CreateObject<RandomPropagationLossModel>();
+        shadowing->SetAttribute("Variable",
+                                StringValue("ns3::NormalRandomVariable[Variance=" +
+                                            std::to_string(std::exp2(11.25)) + "]"));
+        loss->SetNext(shadowing);
 
         channel = CreateObject<LoraChannel>(loss, delay);
     }
@@ -141,6 +138,7 @@ main(int argc, char* argv[])
         mobilityGw.SetPositionAllocator(hexAllocator);
 
         // End Device mobility
+        NS_ASSERT_MSG(filepath != "None", "Bike trips dataset file not provided.");
         mobilityEd.Add(filepath);
     }
 
