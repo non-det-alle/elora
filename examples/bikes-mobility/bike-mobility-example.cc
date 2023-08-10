@@ -36,6 +36,7 @@ main(int argc, char* argv[])
      ***************************/
 
     int periods = 24 * 31; // Hours
+    int nDevs = -1;
     int gatewayRings = 2;
     double range = 2426.85; // Max range for downlink (!) coverage probability > 0.98 (with okumura)
     std::string sir = "CROCE";
@@ -49,6 +50,7 @@ main(int argc, char* argv[])
     {
         CommandLine cmd(__FILE__);
         cmd.AddValue("periods", "Number of periods to simulate (1 period = 1 hour)", periods);
+        cmd.AddValue("devs", "Number of devices to simulate (-1 defaults to all)", nDevs);
         cmd.AddValue("rings", "Number of gateway rings in hexagonal topology", gatewayRings);
         cmd.AddValue("range", "Radius of the device allocation disk around a gateway)", range);
         cmd.AddValue("sir", "Signal to Interference Ratio matrix used for interference", sir);
@@ -73,7 +75,7 @@ main(int argc, char* argv[])
             "that do not overlap in time for the same bike.",
             filepath);
         cmd.Parse(argc, argv);
-        NS_ASSERT((periods >= 0) and (gatewayRings > 0));
+        NS_ASSERT((periods >= 0) and (nDevs >= -1) and (gatewayRings > 0));
     }
 
     /* Apply global configurations */
@@ -149,7 +151,6 @@ main(int argc, char* argv[])
     Ptr<Node> server;
     NodeContainer gateways;
     NodeContainer endDevices;
-    int nDevices = mobilityEd.GetNBikes();
     {
         server = CreateObject<Node>();
 
@@ -157,7 +158,7 @@ main(int argc, char* argv[])
         gateways.Create(nGateways);
         mobilityGw.Install(gateways);
 
-        endDevices.Create(nDevices);
+        endDevices.Create((nDevs == -1) ? mobilityEd.GetNBikes() : nDevs);
         mobilityEd.Install(endDevices);
     }
 
@@ -237,7 +238,7 @@ main(int argc, char* argv[])
      ***************************/
 
     // Initialize SF emulating the ADR algorithm, then add variance to path loss
-    std::vector<int> devPerSF(1, nDevices);
+    std::vector<int> devPerSF(1, endDevices.GetN());
 
     //! Trace simulation metrics
     Time samplePeriod = Hours(printPeriod);
@@ -249,7 +250,7 @@ main(int argc, char* argv[])
     LoraPacketTracker& tracker = loraHelper.GetPacketTracker();
 #ifdef NS3_LOG_ENABLE
     // Print current configuration
-    PrintConfigSetup(nDevices, range, gatewayRings, devPerSF);
+    PrintConfigSetup(endDevices.GetN(), range, gatewayRings, devPerSF);
     loraHelper.EnableSimulationTimePrinting(Hours(24));
 #else
     // Limit memory usage
