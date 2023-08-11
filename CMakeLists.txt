@@ -150,6 +150,7 @@ build_lib(
     ${libbuildings}
     ${libenergy}
     ${libcsma}
+    ${libnetanim}
     ${libtap-bridge}
     ${curl_LIBRARIES}
   TEST_SOURCES

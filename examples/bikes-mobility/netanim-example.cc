@@ -3,6 +3,7 @@
  */
 
 // ns3 imports
+#include "ns3/animation-interface.h"
 #include "ns3/application-container.h"
 #include "ns3/command-line.h"
 #include "ns3/core-module.h"
@@ -228,6 +229,41 @@ main(int argc, char* argv[])
         bikeAppHelper.SetAttribute("Interval", TimeValue(Minutes(2)));
         bikeAppHelper.SetAttribute("PacketSize", UintegerValue(12));
         bikeAppHelper.Install(endDevices);
+    }
+
+    /***************
+     *  Animation  *
+     ***************/
+
+    AnimationInterface::SetConstantPosition(server, 6000, 0);
+    AnimationInterface animInt("bikes-animation.xml"); // Mandatory
+    animInt.SetMobilityPollInterval(Minutes(2));
+    animInt.SetBackgroundImage(
+        "/home/alle/repos/ns-3-dev/contrib/elora/examples/bikes-mobility/netanim-background.png",
+        -5000,
+        -5000,
+        7.45,
+        7.35,
+        0.3);
+
+    animInt.UpdateNodeDescription(server, "LNS");
+    animInt.UpdateNodeColor(server, 0, 0, 255);
+    animInt.UpdateNodeSize(server, 50, 50);
+
+    for (uint32_t i = 0; i < gateways.GetN(); ++i)
+    {
+        auto gw = gateways.Get(i);
+        animInt.UpdateNodeDescription(gw, "GW" + std::to_string(i));
+        animInt.UpdateNodeColor(gw, 191, 227, 180);
+        animInt.UpdateNodeSize(gw, 50, 50);
+    }
+
+    for (uint32_t i = 0; i < endDevices.GetN(); ++i)
+    {
+        auto dev = endDevices.Get(i);
+        animInt.UpdateNodeDescription(dev, std::to_string(i));
+        animInt.UpdateNodeColor(dev, 255, 0, 0);
+        animInt.UpdateNodeSize(dev, 50, 50);
     }
 
     /***************************
