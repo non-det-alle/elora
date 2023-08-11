@@ -52,6 +52,8 @@ BikeSharingMobilityHelper::Add(const std::string filePath,
 {
     NS_LOG_FUNCTION(this << filePath << std::string("'") + delimiter + "'");
 
+    NS_ASSERT(std::ifstream(filePath).good()); // Chek if file can be opened
+
     CsvReader csv(filePath, delimiter);
     csv.FetchNextRow(); // Skip row with column names
     while (csv.FetchNextRow())

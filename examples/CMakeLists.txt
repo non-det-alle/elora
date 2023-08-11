@@ -85,3 +85,11 @@ build_lib_example(
     ${libcore}
     ${liblorawan}
 )
+
+build_lib_example(
+  NAME lorawan-bikes-netanim
+  SOURCE_FILES bikes-mobility/netanim-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${liblorawan}
+)
