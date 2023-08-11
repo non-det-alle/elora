@@ -14,7 +14,6 @@
 
 // lorawan imports
 #include "ns3/bike-application-helper.h"
-#include "ns3/bike-application.h"
 #include "ns3/bike-sharing-mobility-helper.h"
 #include "ns3/forwarder-helper.h"
 #include "ns3/hex-grid-position-allocator.h"
