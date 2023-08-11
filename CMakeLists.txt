@@ -150,9 +150,9 @@ build_lib(
     ${libbuildings}
     ${libenergy}
     ${libcsma}
-    ${libnetanim}
     ${libtap-bridge}
     ${curl_LIBRARIES}
+    ${libnetanim}
   TEST_SOURCES
     test/utilities.cc
     test/lorawan-test-suite.cc

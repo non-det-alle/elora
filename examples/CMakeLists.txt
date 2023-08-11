@@ -71,7 +71,7 @@ build_lib_example(
 )
 
 build_lib_example(
-  NAME elora-example
+  NAME elora
   SOURCE_FILES elora-example.cc
   LIBRARIES_TO_LINK
     ${libcore}
@@ -79,17 +79,22 @@ build_lib_example(
 )
 
 build_lib_example(
-  NAME bike-mobility-example
-  SOURCE_FILES bikes-mobility/bike-mobility-example.cc
+  NAME bikes-mobility-example
+  SOURCE_FILES bikes-mobility/bikes-mobility-example.cc
   LIBRARIES_TO_LINK
-    ${libcore}
     ${liblorawan}
 )
 
 build_lib_example(
-  NAME lorawan-bikes-netanim
-  SOURCE_FILES bikes-mobility/netanim-example.cc
+  NAME bikes-netanim-example
+  SOURCE_FILES bikes-mobility/netanim-bikes-example.cc
   LIBRARIES_TO_LINK
-    ${libcore}
+    ${liblorawan}
+)
+
+build_lib_example(
+  NAME elora-bikes
+  SOURCE_FILES bikes-mobility/elora-bikes-example.cc
+  LIBRARIES_TO_LINK
     ${liblorawan}
 )

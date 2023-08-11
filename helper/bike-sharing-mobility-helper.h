@@ -97,7 +97,7 @@ class BikeSharingMobilityHelper
     void Add(const std::string filename, double Z = 1, char delimiter = ',');
 
     /* Returns the number of distinct bicycles of which we have data available */
-    int GetNBikes(void);
+    int GetNBikes();
 
     /* Install a waypoint mobility model based on bike data on this node */
     void Install(Ptr<Node> node) const;
@@ -106,7 +106,7 @@ class BikeSharingMobilityHelper
     void Install(NodeContainer container) const;
 
   private:
-    const TripList_t& GetNextBike(void) const;
+    const TripList_t& GetNextBike() const;
 
     BikeDataMap_t m_data;                            //! map of bikes and associated list of trips
     mutable BikeDataMap_t::const_iterator m_current; //!< vector iterator

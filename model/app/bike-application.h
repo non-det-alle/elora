@@ -41,18 +41,18 @@ class BikeApplication : public LoraApplication
 {
   public:
     BikeApplication();
-    virtual ~BikeApplication();
+    ~BikeApplication() override;
 
-    static TypeId GetTypeId(void);
+    static TypeId GetTypeId();
 
   protected:
     void DoInitialize() override;
     void DoDispose() override;
 
   private:
-    virtual void StartApplication(void);
+    void StartApplication() override;
 
-    void SendPacket(void);
+    void SendPacket() override;
 
     Ptr<WaypointMobilityModel> m_mobility;
 };
