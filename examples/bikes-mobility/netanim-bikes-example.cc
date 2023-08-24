@@ -236,14 +236,15 @@ main(int argc, char* argv[])
 
     AnimationInterface::SetConstantPosition(server, 6000, 0);
     AnimationInterface animInt("bikes-animation.xml"); // Mandatory
-    animInt.SetMobilityPollInterval(Minutes(2));
+    animInt.SetMobilityPollInterval(Minutes(1));
+    animInt.SkipPacketTracing();
     animInt.SetBackgroundImage(
         "/home/alle/repos/ns-3-dev/contrib/elora/examples/bikes-mobility/netanim-background.png",
         -5000,
         -5000,
-        7.45,
-        7.35,
-        0.3);
+        4.2,
+        4.15,
+        0.6);
 
     animInt.UpdateNodeDescription(server, "LNS");
     animInt.UpdateNodeColor(server, 0, 0, 255);

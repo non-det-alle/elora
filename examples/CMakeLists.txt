@@ -86,7 +86,7 @@ build_lib_example(
 )
 
 build_lib_example(
-  NAME bikes-netanim-example
+  NAME netanim-bikes-example
   SOURCE_FILES bikes-mobility/netanim-bikes-example.cc
   LIBRARIES_TO_LINK
     ${liblorawan}
