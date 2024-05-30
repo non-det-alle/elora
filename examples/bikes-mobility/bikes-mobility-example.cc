@@ -114,7 +114,7 @@ main(int argc, char* argv[])
         auto shadowing = CreateObject<RandomPropagationLossModel>();
         shadowing->SetAttribute("Variable",
                                 StringValue("ns3::NormalRandomVariable[Variance=" +
-                                            std::to_string(std::exp2(11.25)) + "]"));
+                                            std::to_string(pow(11.25, 2)) + "]"));
         loss->SetNext(shadowing);
 
         channel = CreateObject<LoraChannel>(loss, delay);

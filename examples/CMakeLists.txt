@@ -71,7 +71,7 @@ build_lib_example(
 )
 
 build_lib_example(
-  NAME elora
+  NAME elora-example
   SOURCE_FILES elora-example.cc
   LIBRARIES_TO_LINK
     ${libcore}
