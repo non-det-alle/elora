@@ -82,8 +82,9 @@ main(int argc, char* argv[])
     {
         Config::SetDefault("ns3::BaseEndDeviceLorawanMac::ADRBit",
                            BooleanValue(adrEnabled)); //!< ADR bit
-        Config::SetDefault("ns3::AdrComponent::SNRDeviceMargin",
-                           DoubleValue(10 * log10(-1 / log(0.98))));
+        Config::SetDefault("ns3::AdrComponent::SNRDeviceMargin", DoubleValue(10));
+        Config::SetDefault("ns3::BaseEndDeviceLorawanMac::FType",
+                           EnumValue(LorawanMacHeader::CONFIRMED_DATA_UP));
     }
 
     /* Logging options */

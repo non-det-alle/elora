@@ -19,6 +19,7 @@
 #include "ns3/chirpstack-helper.h"
 #include "ns3/hex-grid-position-allocator.h"
 #include "ns3/lorawan-helper.h"
+#include "ns3/lorawan-mac-header.h"
 #include "ns3/udp-forwarder-helper.h"
 
 using namespace ns3;
@@ -89,10 +90,10 @@ main(int argc, char* argv[])
         GlobalValue::Bind("ChecksumEnabled", BooleanValue(true));
         Config::SetDefault("ns3::BaseEndDeviceLorawanMac::ADRBackoff", BooleanValue(true));
         Config::SetDefault("ns3::BaseEndDeviceLorawanMac::EnableCryptography", BooleanValue(true));
-        Config::SetDefault("ns3::AdrComponent::SNRDeviceMargin",
-                           DoubleValue(10 * log10(-1 / log(0.98))));
         ///////////////// Needed to manage the variance introduced by real world interaction
         Config::SetDefault("ns3::ClassAEndDeviceLorawanMac::RecvWinSymb", UintegerValue(16));
+        Config::SetDefault("ns3::BaseEndDeviceLorawanMac::FType",
+                           EnumValue(LorawanMacHeader::CONFIRMED_DATA_UP));
     }
 
     /* Logging options */
