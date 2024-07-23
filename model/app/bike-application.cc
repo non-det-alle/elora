@@ -34,7 +34,7 @@ NS_LOG_COMPONENT_DEFINE("BikeApplication");
 NS_OBJECT_ENSURE_REGISTERED(BikeApplication);
 
 TypeId
-BikeApplication::GetTypeId(void)
+BikeApplication::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::BikeApplication")
                             .SetParent<LoraApplication>()
@@ -72,7 +72,7 @@ BikeApplication::DoDispose()
 }
 
 void
-BikeApplication::StartApplication(void)
+BikeApplication::StartApplication()
 {
     NS_LOG_FUNCTION(this);
     // Schedule the next SendPacket event
@@ -84,7 +84,7 @@ BikeApplication::StartApplication(void)
 }
 
 void
-BikeApplication::SendPacket(void)
+BikeApplication::SendPacket()
 {
     NS_LOG_FUNCTION(this);
 

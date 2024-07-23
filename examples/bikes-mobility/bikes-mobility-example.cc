@@ -2,6 +2,8 @@
  * This program creates an elora network with nodes implementing bicycle mobility.
  */
 
+#include "../utilities.cc"
+
 // ns3 imports
 #include "ns3/application-container.h"
 #include "ns3/command-line.h"
@@ -24,8 +26,7 @@
 using namespace ns3;
 using namespace lorawan;
 
-NS_LOG_COMPONENT_DEFINE("BikeMobilityExample");
-#include "../utilities.cc"
+NS_LOG_COMPONENT_DEFINE_EXAMPLE_WITH_UTILITIES("BikeMobilityExample");
 
 int
 main(int argc, char* argv[])

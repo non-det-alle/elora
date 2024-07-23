@@ -155,7 +155,7 @@ BikeSharingMobilityHelper::Install(Ptr<Node> node) const
 void
 BikeSharingMobilityHelper::Install(NodeContainer c) const
 {
-    for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i)
+    for (auto i = c.Begin(); i != c.End(); ++i)
     {
         Install(*i);
     }

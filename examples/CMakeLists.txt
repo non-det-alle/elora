@@ -82,19 +82,19 @@ build_lib_example(
   NAME bikes-mobility-example
   SOURCE_FILES bikes-mobility/bikes-mobility-example.cc
   LIBRARIES_TO_LINK
-    ${liblorawan}
+    ${libelora}
 )
 
 build_lib_example(
   NAME netanim-bikes-example
   SOURCE_FILES bikes-mobility/netanim-bikes-example.cc
   LIBRARIES_TO_LINK
-    ${liblorawan}
+    ${libelora}
 )
 
 build_lib_example(
   NAME elora-bikes
   SOURCE_FILES bikes-mobility/elora-bikes-example.cc
   LIBRARIES_TO_LINK
-    ${liblorawan}
+    ${libelora}
 )
