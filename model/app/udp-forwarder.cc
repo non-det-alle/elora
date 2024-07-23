@@ -804,12 +804,12 @@ UdpForwarder::ReceiveAck(Ptr<Socket> sockUp)
     clock_gettime(CLOCK_MONOTONIC, &m_upRecvTime);
     if ((j < 4) || (buff_ack[0] != PROTOCOL_VERSION) || (buff_ack[3] != PKT_PUSH_ACK))
     {
-        NS_LOG_WARN ("[up] ignored invalid non-ACL packet");
+        NS_LOG_WARN("[up] ignored invalid non-ACL packet");
         m_remainingRecvAckAttempts--; /* continue; */
     }
     else if ((buff_ack[1] != m_upTokenH) || (buff_ack[2] != m_upTokenL))
     {
-        NS_LOG_WARN ("[up] ignored out-of sync ACK packet");
+        NS_LOG_WARN("[up] ignored out-of sync ACK packet");
         m_remainingRecvAckAttempts--; /* continue; */
     }
     else

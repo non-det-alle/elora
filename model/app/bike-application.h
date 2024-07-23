@@ -23,7 +23,8 @@
 #ifndef BIKE_APPLICATION_H
 #define BIKE_APPLICATION_H
 
-#include "ns3/lora-application.h"
+#include "lora-application.h"
+
 #include "ns3/waypoint-mobility-model.h"
 
 namespace ns3
