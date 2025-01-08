@@ -138,25 +138,37 @@ set(header_files
     third-party/loramac-node/cmac.h
 )
 
-build_lib(
-  LIBNAME elora
-  SOURCE_FILES ${source_files}
-  HEADER_FILES ${header_files}
-  LIBRARIES_TO_LINK
-    ${libpoint-to-point}
-    ${libinternet-apps}
-    ${libapplications}
-    ${libpropagation}
-    ${libbuildings}
-    ${libenergy}
-    ${libcsma}
-    ${libtap-bridge}
-    ${curl_LIBRARIES}
-    ${libnetanim}
-  TEST_SOURCES
-    test/utilities.cc
-    test/lorawan-test-suite.cc
-    test/network-status-test-suite.cc
-    test/network-scheduler-test-suite.cc
-    test/network-server-test-suite.cc
+find_external_library(
+  DEPENDENCY_NAME curl
+  HEADER_NAME curl.h
+  LIBRARY_NAME curl
 )
+
+if(${curl_FOUND})
+  build_lib(
+    LIBNAME elora
+    SOURCE_FILES ${source_files}
+    HEADER_FILES ${header_files}
+    LIBRARIES_TO_LINK
+      ${libenergy}
+      ${libpoint-to-point}
+      ${libbuildings}
+      ${libinternet}
+      ${curl_LIBRARIES}
+    TEST_SOURCES
+      test/utilities.cc
+      test/lorawan-test-suite.cc
+      test/network-status-test-suite.cc
+      test/network-scheduler-test-suite.cc
+      test/network-server-test-suite.cc
+  )
+  target_include_directories(
+    elora
+    PRIVATE ${curl_INCLUDE_DIRS}
+  )
+else()
+  message(
+    ${HIGHLIGHTED_STATUS}
+    "curl was not found. elora won't be built"
+  )
+endif()

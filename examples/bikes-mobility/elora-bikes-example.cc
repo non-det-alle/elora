@@ -42,10 +42,7 @@ main(int argc, char* argv[])
     std::string tenant = "ELoRa";
     std::string apiAddr = "127.0.0.1";
     uint16_t apiPort = 8090;
-    std::string token =
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."
-        "eyJhdWQiOiJjaGlycHN0YWNrIiwiaXNzIjoiY2hpcnBzdGFjayIsInN1YiI6IjZlMjQ4NjljLWQxMjItNDZkOS04Nz"
-        "E0LTM5Yzc4Nzg4OTRhZCIsInR5cCI6ImtleSJ9.IB20o6Jrcwj5qZ9mPEuthzzqMyc3YNSl8by_ZXrjqhw";
+    std::string token = "...";
     uint16_t destPort = 1700;
 
     int periods = 24 * 31; // Hours
@@ -81,6 +78,7 @@ main(int argc, char* argv[])
             "that do not overlap in time for the same bike.",
             filepath);
         cmd.Parse(argc, argv);
+        NS_ABORT_MSG_IF(token == "...", "Please provide an auth token for the ChirpStack API");
         NS_ASSERT((periods >= 0) and (nDevs >= -1) and (gatewayRings > 0));
     }
 
@@ -132,9 +130,9 @@ main(int argc, char* argv[])
         channel = CreateObject<LoraChannel>(loss, delay);
     }
 
-    /**************
-     *  Mobility  *
-     **************/
+    /*************************
+     *  Position & mobility  *
+     *************************/
 
     MobilityHelper mobilityGw;
     BikeSharingMobilityHelper mobilityEd;
@@ -203,8 +201,10 @@ main(int argc, char* argv[])
     tapBridge.SetAttribute("DeviceName", StringValue("ns3-tap"));
     tapBridge.Install(exitnode, exitnode->GetDevice(0));
 
-    LorawanHelper loraHelper;
+    /* Radio side (between end devicees and gateways) */
     {
+        LorawanHelper helper;
+
         // Physiscal layer settings
         LoraPhyHelper phyHelper;
         phyHelper.SetInterference("IsolationMatrix", EnumValue(sirMap.at(sir)));
@@ -223,12 +223,12 @@ main(int argc, char* argv[])
         // Create the LoraNetDevices of the gateways
         phyHelper.SetType("ns3::GatewayLoraPhy");
         macHelper.SetType("ns3::GatewayLorawanMac");
-        loraHelper.Install(phyHelper, macHelper, gateways);
+        helper.Install(phyHelper, macHelper, gateways);
 
         // Create the LoraNetDevices of the end devices
         phyHelper.SetType("ns3::EndDeviceLoraPhy");
         macHelper.SetType("ns3::ClassAEndDeviceLorawanMac");
-        loraHelper.Install(phyHelper, macHelper, endDevices);
+        helper.Install(phyHelper, macHelper, endDevices);
     }
 
     /*************************
@@ -254,18 +254,15 @@ main(int argc, char* argv[])
      ***************************/
 
     ///////////////////// Signal handling
-    OnInterrupt([](int signal) { csHelper.CloseConnection(signal); });
+    OnInterrupt([](int signal) {
+        csHelper.CloseConnection(signal);
+        OnInterrupt(SIG_DFL); // avoid multiple executions
+        exit(0);
+    });
     ///////////////////// Register tenant, gateways, and devices on the real server
     csHelper.SetTenant(tenant);
     csHelper.InitConnection(apiAddr, apiPort, token);
     csHelper.Register(NodeContainer(endDevices, gateways));
-
-#ifdef NS3_LOG_ENABLE
-    // Print current configuration
-    std::vector<int> nDevsPerSF(1, endDevices.GetN());
-    PrintConfigSetup(endDevices.GetN(), range, gatewayRings, nDevsPerSF);
-    loraHelper.EnableSimulationTimePrinting(Hours(24));
-#endif // NS3_LOG_ENABLE
 
     Simulator::Stop(Hours(periods));
 

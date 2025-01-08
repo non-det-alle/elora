@@ -26,13 +26,12 @@ To use this simulator you need to know the following:
 
 If not already, install the `libcurl` development library in your linux distribution (`libcurl4-gnutls-dev` on Ubuntu, `curl-dev` on Alpine).
 
-Clone [ns-3](https://www.nsnam.org "ns-3 Website"), clone this repository inside the `contrib` directory, checkout the right commit, and patch ns-3 using the provided [patch file](ns-3-dev.patch) with the following all-in-one command:
+Clone [ns-3](https://www.nsnam.org "ns-3 Website"), clone this repository inside the `contrib` directory, and checkout the right commit with the following all-in-one command:
 
 ```bash
 git clone https://gitlab.com/nsnam/ns-3-dev.git && cd ns-3-dev &&
-git clone https://github.com/non-det-alle/elora.git contrib/elora &&
-tag=$(< contrib/elora/NS3-VERSION) && tag=${tag#release } && git checkout $tag -b $tag &&
-patch -p1 -s < contrib/elora/ns-3-dev.patch
+git clone https://github.com/Orange-OpenSource/elora.git contrib/elora &&
+tag=$(< contrib/elora/NS3-VERSION) && tag=${tag#release } && git checkout $tag -b $tag
 ```
 
 Make sure you are in the `ns-3-dev` directory, then configure and build ns-3 with the following all-in-one command:
@@ -42,7 +41,7 @@ Make sure you are in the `ns-3-dev` directory, then configure and build ns-3 wit
 ./ns3 build
 ```
 
-The `elora` module extends the code of the original `lorawan` ns-3 module, thus the two modules are in conflict if they are built together. If you also have the original `lorawan` module installed (either in the `contrib` or `src` directory), run `./ns3 clean` and add the  `--enable-modules elora` option to the `./ns3 configure` command above to avoid building both.
+The `elora` module extends the code of the original `lorawan` ns-3 module, thus the two modules are in conflict if they are built together. If you also have the original `lorawan` module installed (either in the `contrib` or `src` directory), run `./ns3 clean` and add the  `--enable-modules "elora;tap-bridge;csma"` option to the `./ns3 configure` command above to avoid building both.
 
 ## Usage examples
 
@@ -58,12 +57,16 @@ Options can be retrived with `./ns3 run "elora-example --help"`.
 
 For a description of the module, refer to `doc/lorawan.rst` (currently not up to date with all functionalities).
 
-For more information on how to use the underlying LoRaWAN module refer also to the [original module readme](https://github.com/signetlabdei/lorawan/blob/e8f7a21044418e92759d5c7c4bcab147cdaf05b3/README.md "LoRaWAN ns-3 module README").
+For more information on how to use the underlying LoRaWAN module refer also to the [original ns-3 repository](https://github.com/signetlabdei/lorawan "LoRaWAN ns-3 module").
 
 * [ns-3 tutorial](https://www.nsnam.org/docs/tutorial/html "ns-3 Tutorial")
 * [ns-3 manual](https://www.nsnam.org/docs/manual/html "ns-3 Manual")
 * The LoRaWAN specification can be found on the [LoRa Alliance
   website](http://www.lora-alliance.org)
+
+## Copyright
+
+Code copyright 2022-2023 Orange.
 
 ## License
 
@@ -76,4 +79,4 @@ If you need any help, feel free to open an issue here.
 
 ## Cite us
 
-[A. Aimi, S. Rovedakis, F. Guillemin, and S. Secci, “ELoRa: End-to-end Emulation of Massive IoT LoRaWAN Infrastructures,” 2023 IEEE/IFIP Network Operations and Management Symposium (NOMS), May 2023, Miami, FL, United States.](https://hal.science/hal-04025834)
+[A. Aimi, S. Rovedakis, F. Guillemin, and S. Secci, “ELoRa: End-to-end Emulation of Massive IoT LoRaWAN Infrastructures,” 2023 IEEE/IFIP Network Operations and Management Symposium (NOMS), May 2023, Miami, FL, United States.](https://doi.org/10.1109/NOMS56928.2023.10154373)
