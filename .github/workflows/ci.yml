@@ -33,12 +33,12 @@ jobs:
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "${{ env.CI_COMMIT_EMAIL }}"
           if [[ `git status --porcelain --untracked-files=no` ]]; then
-            git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}" && git push
-          else
-            echo "no changes to be pushed"
+            git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
           fi
       - run: |
-          if [[ ${{ startsWith(github.ref, 'refs/tags/') }} ]]; then
+          tag=""
+          if [[ ${{ startsWith(github.ref, 'refs/tags/') }} = true ]]; then
             tag="${{ github.ref }}" && tag=${tag#refs/tags/}
-            git tag $tag && git push -u origin $tag
-          fi
+            git tag $tag
+            fi
+          git push --atomic origin ci $tag
