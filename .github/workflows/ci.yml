@@ -43,6 +43,6 @@ jobs:
             echo "pushing new tag $tag to origin"
             git tag $tag && git push origin tag $tag
           else
-            echo "pushing new commit to origin master"
-            git push origin master
+            echo "pushing new commit to origin"
+            git push
           fi
