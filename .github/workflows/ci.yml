@@ -24,7 +24,6 @@ jobs:
           tag=$(< ./build/elora/NS3-VERSION) && tag=${tag#release }
           git -C ./build/ns-3-dev/ fetch --depth 1 origin refs/tags/$tag
           git -C ./build/ns-3-dev/ checkout FETCH_HEAD
-      # - run: touch test.txt && git add .
       - env:
           CI_COMMIT_MESSAGE: "pull elora latest changes"
           CI_COMMIT_AUTHOR: github-actions[bot]
@@ -34,12 +33,17 @@ jobs:
           git config --global user.email "${{ env.CI_COMMIT_EMAIL }}"
           if [[ `git status --porcelain --untracked-files=no` ]]; then
             git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
+          else
+            echo "ERROR: no changes detected"
+            exit 1
           fi
       - run: |
           tag=""
           if [[ "${{ startsWith(github.ref, 'refs/tags/') }}" == "true" ]]; then
             echo "this is a tag"
             tag="${{ github.ref }}" && tag=${tag#refs/tags/}
-            git tag $tag
-            fi
-          git push --atomic origin master $tag
+            git tag $tag && git push origin tag $tag
+          else
+            echo "new commits to master"
+            git push origin master
+          fi
