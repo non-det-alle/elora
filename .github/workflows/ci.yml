@@ -3,7 +3,7 @@ name: ci
 on:
   push:
     branches:
-      - ci
+      - master
     tags:
       - v*.*.*
 
@@ -14,8 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          repository: non-det-alle/elora-docker-test
-          token: ${{ secrets.ELORA_DOCKER_TEST_TOKEN }}
+          repository: non-det-alle/elora-docker
+          token: ${{ secrets.ELORA_DOCKER_TOKEN }}
           submodules: true
       - run: |
           git -C ./build/elora/ fetch --depth 1 origin "${{ github.ref }}"
