@@ -37,8 +37,9 @@ jobs:
           fi
       - run: |
           tag=""
-          if [[ ${{ startsWith(github.ref, 'refs/tags/') }} = true ]]; then
+          if [[ ${{ startsWith(github.ref, 'refs/tags/') }} ]]; then
+            echo "this is a tag"
             tag="${{ github.ref }}" && tag=${tag#refs/tags/}
             git tag $tag
             fi
-          git push --atomic origin ci $tag
+          git push --atomic origin master $tag
