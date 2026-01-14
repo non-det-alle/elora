@@ -25,23 +25,20 @@ jobs:
           git -C ./build/ns-3-dev/ fetch --depth 1 origin refs/tags/$tag
           git -C ./build/ns-3-dev/ checkout FETCH_HEAD
       # - run: touch test.txt && git add .
-      # - run: |
-      #     if [[ "${{ startsWith(github.ref, 'refs/tags/') == 'true' }}" ]]; then
-      #       tag="${{ github.ref }}" && tag=${tag#refs/tags/}
-      #       git tag $tag
-      #       git push --tags
-      #     fi
       - env:
-          CI_COMMIT_MESSAGE: "update elora latest changes"
+          CI_COMMIT_MESSAGE: "pull elora latest changes"
           CI_COMMIT_AUTHOR: github-actions[bot]
           CI_COMMIT_EMAIL: username@users.noreply.github.com
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "${{ env.CI_COMMIT_EMAIL }}"
           if [[ `git status --porcelain --untracked-files=no` ]]; then
-            git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
-            git push
+            git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}" && git push
           else
             echo "no changes to be pushed"
-            exit 0
+          fi
+      - run: |
+          if [[ "${{ startsWith(github.ref, 'refs/tags/') == 'true' }}" ]]; then
+            tag="${{ github.ref }}" && tag=${tag#refs/tags/}
+            git tag $tag && git push -u origin $tag
           fi
